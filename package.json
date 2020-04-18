@@ -1,0 +1,15 @@
+{
+  "name": "radi-async",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node fuse"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENCED",
+  "dependencies": {
+    "fuse-box": "^4.0.0-next.426"
+  }
+}
