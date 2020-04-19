@@ -93,17 +93,34 @@ export async function render(node, context = {}) {
       let outputIsContext = Object.getPrototypeOf(next.value) === Context;
 
       if (outputIsContext) {
-        const contextName = next.value && next.value.name;
-        const currentContext = context[contextName];
+        do {
+          const contextName = next.value && next.value.name;
+          const currentContext = context[contextName];
 
-        if (!currentContext) {
-          throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
-        }
+          if (!currentContext) {
+            throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
+          }
 
-        currentContext[1].push(scope.next);
+          currentContext[1].push(scope.next);
 
-        next = await output.next(currentContext[0]);
+          next = await output.next(currentContext[0]);
+
+          outputIsContext = Object.getPrototypeOf(next.value) === Context;
+        } while (outputIsContext);
       }
+
+      // if (outputIsContext) {
+      //   const contextName = next.value && next.value.name;
+      //   const currentContext = context[contextName];
+
+      //   if (!currentContext) {
+      //     throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
+      //   }
+
+      //   currentContext[1].push(scope.next);
+
+      //   next = await output.next(currentContext[0]);
+      // }
 
       node.instance = next.value;
 

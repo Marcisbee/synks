@@ -149,32 +149,49 @@ function App() {
       --
       <Counter initial={0} />
       after
-      <hr/>
+      <hr />
       Context:
       <ContextApp />
     </div>
   );
 }
 
+var num = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ");
+var tens = "twenty thirty forty fifty sixty seventy eighty ninety".split(" ");
+
+function number2words(n) {
+  if (n < 20) return num[n];
+  var digit = n % 10;
+  if (n < 100) return tens[~~(n / 10) - 2] + (digit ? "-" + num[digit] : "");
+  if (n < 1000) return num[~~(n / 100)] + " hundred" + (n % 100 == 0 ? "" : " " + number2words(n % 100));
+  return number2words(~~(n / 1000)) + " thousand" + (n % 1000 != 0 ? " " + number2words(n % 1000) : "");
+}
+class NumberContext extends Radi.Context {
+  name = 'zero';
+  toWord(number) {
+    this.name = number2words(number);
+  }
+}
 
 class CountContext extends Radi.Context {
   count = 0;
   increment() {
-    this.count += 1;
-    this.update();
+    return this.count += 1;
   }
 }
 
 function* Comp() {
   const [countContext, next] = yield CountContext;
+  // @TODO: Do multiple contexts
+  const [numberContext] = yield NumberContext;
 
   while (true) {
     yield (
       <div>
         <h1 className={countContext.count}>
-          {countContext.count}<CountButton />
+          {countContext.count} ({numberContext.name}) <CountButton />
         </h1>
-        <button onclick={() => countContext.increment()}>
+        <button onclick={() => numberContext.toWord(countContext.increment())}>
           +
         </button>
         <button onclick={() => { next({ count: countContext.count - 1 }) }}>
@@ -190,11 +207,15 @@ function ContextApp() {
     <div>
       {/* <Comp /> */}
       <CountContext>
-        {Math.random().toString()}
-        <CountButton />
-        <Comp />
-        <hr/>
-        <Comp />
+        <div>
+          <NumberContext>
+            {Math.random().toString()}
+            <CountButton />
+            <Comp />
+            <hr />
+            <Comp />
+          </NumberContext>
+        </div>
       </CountContext>
     </div>
   );
@@ -205,7 +226,7 @@ function* CountButton() {
 
   while (true) {
     yield (
-      <button onclick={() => {count++, this.next()}}>
+      <button onclick={() => { count++, this.next() }}>
         {count}
       </button>
     );
