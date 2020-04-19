@@ -9,9 +9,9 @@ export async function mount(node, container = document.body) {
   let output;
 
   try {
-    output = await patch(node, container);
+    output = await patch(node, container, 0, {});
   } catch (e) {
-    console.error("[Radi] Uncaught error:", e);
+    console.error("[Radi]", e);
   }
 
   return output;

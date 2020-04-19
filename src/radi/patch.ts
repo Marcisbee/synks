@@ -1,7 +1,7 @@
 import { render } from './render';
 import variables from './variables';
 
-export async function patch(node, container, actionType = 0) {
+export async function patch(node, container, actionType = 0, context) {
   const historyInstance = container.history && container.history.type instanceof Function && container.history.instance;
   const history = historyInstance
     ? { ...historyInstance, target: container.history.target }
@@ -12,7 +12,7 @@ export async function patch(node, container, actionType = 0) {
     let output = [];
 
     for (let child of node) {
-      output.push(await patch(child, container, actionType));
+      output.push(await patch(child, container, actionType, context));
     }
 
     return output;
@@ -43,13 +43,13 @@ export async function patch(node, container, actionType = 0) {
         const child = node.children[index];
         const childNode = history.target.childNodes[index];
         if (childNode !== undefined) {
-          await patch(child, childNode, 2);
+          await patch(child, childNode, 2, context);
         } else {
-          await patch(child, history.target);
+          await patch(child, history.target, 0, context);
         }
       }
 
-      Array.prototype.slice.call(history.target.childNodes).map((childNode, index) => {
+      Array.prototype.slice.call(history.target.childNodes || []).map((childNode, index) => {
         if (node.children[index] === undefined) {
           history.target.removeChild(childNode);
         }
@@ -68,7 +68,7 @@ export async function patch(node, container, actionType = 0) {
     }
   }
 
-  const element = await render(node);
+  const element = await render(node, context);
 
   element.history = node;
   node.target = element;

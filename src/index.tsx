@@ -149,6 +149,52 @@ function App() {
       --
       <Counter initial={0} />
       after
+      <hr/>
+      Context:
+      <ContextApp />
+    </div>
+  );
+}
+
+
+class CountContext extends Radi.Context {
+  count = 0;
+  increment() {
+    this.count += 1;
+    this.update();
+  }
+}
+
+function* Comp() {
+  const [countContext, next] = yield CountContext;
+
+  while (true) {
+    yield (
+      <div>
+        <h1 className={countContext.count}>
+          {countContext.count}
+        </h1>
+        <button onclick={() => countContext.increment()}>
+          +
+        </button>
+        <button onclick={() => { next({ count: countContext.count - 1 }) }}>
+          -
+        </button>
+      </div>
+    )
+  }
+}
+
+function ContextApp() {
+  return (
+    <div>
+      {/* <Comp /> */}
+      <CountContext>
+        {Math.random().toString()}
+        <Comp />
+        <hr/>
+        <Comp />
+      </CountContext>
     </div>
   );
 }
@@ -169,4 +215,5 @@ function Test() {
 
   // await Radi.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
   await Radi.mount(<App />, document.getElementById('root'));
+  // await Radi.mount(<ContextApp />, document.getElementById('root'));
 })();

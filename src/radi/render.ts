@@ -1,13 +1,14 @@
 import { setProps } from './set-props';
 import { patch } from './patch';
+import { Context } from './Context';
 import variables from './variables';
 
-export async function render(node) {
+export async function render(node, context = {}) {
   if (Array.isArray(node)) {
     let output = [];
 
     for (let child of node) {
-      output.push(await render(child));
+      output.push(await render(child, context));
     }
 
     return output;
@@ -21,14 +22,34 @@ export async function render(node) {
     const placeholder = document.createComment("");
     const output = await node;
 
-    patch(output, placeholder, 1);
+    patch(output, placeholder, 1, context);
 
     return placeholder;
   }
 
   if (node.type instanceof Function) {
+    const isContext = node.type.prototype instanceof Context;
     let currentNode;
     let asyncIterator;
+    let output;
+
+    if (isContext) {
+      const currentContext = new node.type(node.props);
+      const name = node.type.name;
+      const events = [];
+
+      const nextFn = (newContext) => {
+        Object.assign(currentContext, newContext);
+        events.forEach((fn) => fn());
+      };
+      currentContext.update = () => nextFn.call(currentContext);
+      const ctx = [currentContext, nextFn];
+
+      return currentNode = await render(node.children, {
+        ...context,
+        [name]: [ctx, events],
+      });
+    }
 
     const scope = {
       async next() {
@@ -41,16 +62,17 @@ export async function render(node) {
           return (currentNode = await patch(
             output,
             currentNode,
-            2
+            2,
+            context
           ));
         }
 
         if (!currentNode) {
-          throw new Error("[Radi] `this.next` can not be called initially");
+          throw new Error("`this.next` can not be called initially");
         }
 
         const next = await output.next();
-        return (currentNode = await patch(next.value, currentNode, 2));
+        return (currentNode = await patch(next.value, currentNode, 2, context));
       },
       async *[(Symbol as any).asyncIterator]() {
         asyncIterator = true;
@@ -61,17 +83,32 @@ export async function render(node) {
       }
     };
 
-    let output = node.type.call(scope, {
+    output = node.type.call(scope, {
       ...node.props,
       children: node.children
     });
 
     if (output.next && output.throw && output.return) {
-      const next = await output.next();
+      let next = await output.next();
+
+      const outputIsContext = next.value && next.value.prototype instanceof Context;
+
+      if (outputIsContext) {
+        const contextName = next.value && next.value.name;
+        const currentContext = context[contextName];
+
+        if (!currentContext) {
+          throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
+        }
+
+        currentContext[1].push(scope.next);
+
+        next = await output.next(currentContext[0]);
+      }
 
       node.instance = next.value;
 
-      currentNode = await render(next.value);
+      currentNode = await render(next.value, context);
 
       if (asyncIterator) {
         scope.next();
@@ -82,7 +119,7 @@ export async function render(node) {
 
     node.instance = output;
 
-    return (currentNode = await render(output));
+    return (currentNode = await render(output, context));
   }
 
   if (typeof node.type === "string") {
@@ -99,7 +136,7 @@ export async function render(node) {
     // set attributes
     setProps(element, node.props);
 
-    await patch(node.children, element);
+    await patch(node.children, element, 0, context);
 
     return element;
   }
