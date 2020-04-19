@@ -28,7 +28,7 @@ export async function render(node, context = {}) {
   }
 
   if (node.type instanceof Function) {
-    const isContext = node.type.prototype instanceof Context;
+    const isContext = Object.getPrototypeOf(node.type) === Context;
     let currentNode;
     let asyncIterator;
     let output;
@@ -42,7 +42,7 @@ export async function render(node, context = {}) {
         Object.assign(currentContext, newContext);
         events.forEach((fn) => fn());
       };
-      currentContext.update = () => nextFn.call(currentContext);
+      currentContext.__update = () => nextFn.call(currentContext);
       const ctx = [currentContext, nextFn];
 
       return currentNode = await render(node.children, {
@@ -90,8 +90,7 @@ export async function render(node, context = {}) {
 
     if (output.next && output.throw && output.return) {
       let next = await output.next();
-
-      const outputIsContext = next.value && next.value.prototype instanceof Context;
+      let outputIsContext = Object.getPrototypeOf(next.value) === Context;
 
       if (outputIsContext) {
         const contextName = next.value && next.value.name;
