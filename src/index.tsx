@@ -172,7 +172,7 @@ function* Comp() {
     yield (
       <div>
         <h1 className={countContext.count}>
-          {countContext.count}
+          {countContext.count}<CountButton />
         </h1>
         <button onclick={() => countContext.increment()}>
           +
@@ -191,6 +191,7 @@ function ContextApp() {
       {/* <Comp /> */}
       <CountContext>
         {Math.random().toString()}
+        <CountButton />
         <Comp />
         <hr/>
         <Comp />
@@ -199,13 +200,16 @@ function ContextApp() {
   );
 }
 
-let count = 0;
-function Test() {
-  return (
-    <button onclick={() => {count++, this.next()}}>
-      {count}
-    </button>
-  );
+function* CountButton() {
+  let count = 0;
+
+  while (true) {
+    yield (
+      <button onclick={() => {count++, this.next()}}>
+        {count}
+      </button>
+    );
+  }
 }
 
 (async () => {
