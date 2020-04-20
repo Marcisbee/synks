@@ -70,7 +70,7 @@ export async function patch(node, container, actionType = 0, context) {
 
   const element = await render(node, context);
 
-  if (element instanceof Object) {
+  if (node instanceof Object) {
     element.history = node;
     node.target = element;
   }

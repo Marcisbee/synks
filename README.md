@@ -47,7 +47,7 @@ For this we'll need to use generators as they can have state inside them.
 function *Counter() {
   let count = 0;
 
-  function increment() {
+  const increment = () => {
     count++;
     this.next();
   }
