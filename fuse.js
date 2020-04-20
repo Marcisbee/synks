@@ -21,9 +21,13 @@ class Context {
     })
 }
 
-const { task, rm } = sparky(Context);
+const { task } = sparky(Context);
 
 task('default', async (ctx) => {
   const fuse = ctx.getConfig();
-  await fuse.runDev();
+  await fuse.runDev({
+    bundles: {
+      distRoot: '.temp',
+    },
+  });
 });

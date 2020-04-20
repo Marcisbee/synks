@@ -21,6 +21,14 @@ export default [
     plugins: [
       typescript({
         typescript: require('typescript'),
+        tsconfigDefaults: {
+          compilerOptions: {
+            declaration: true,
+          },
+          include: [
+            'src'
+          ]
+        },
       }),
     ],
   },

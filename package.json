@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Asynchronous view renderer",
   "main": "dist/synks.js",
+  "types": "dist/index.d.ts",
   "module": "dist/synks.es.js",
   "jsnext:main": "dist/synks.es.js",
   "scripts": {

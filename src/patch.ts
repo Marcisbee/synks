@@ -70,8 +70,10 @@ export async function patch(node, container, actionType = 0, context) {
 
   const element = await render(node, context);
 
-  element.history = node;
-  node.target = element;
+  if (element instanceof Object) {
+    element.history = node;
+    node.target = element;
+  }
 
   if (node.type instanceof Function && actionType === 2) {
     return;
