@@ -22,7 +22,5 @@ export class Context {
     });
   }
 
-  __update() {
-
-  }
+  __update() { }
 }

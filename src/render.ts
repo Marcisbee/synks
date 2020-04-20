@@ -2,10 +2,14 @@ import { setProps } from './set-props';
 import { patch } from './patch';
 import { Context } from './Context';
 import variables from './variables';
+import { setZeroTimeout } from './utils/set-zero-timeout';
+import { arrayUnique } from './utils/array-unique';
 
 export interface CustomNode extends Node {
   history?: unknown;
 }
+
+let updateQueue = [];
 
 export async function render(node, context = {}): Promise<CustomNode | CustomNode[]> {
   if (Array.isArray(node)) {
@@ -42,11 +46,19 @@ export async function render(node, context = {}): Promise<CustomNode | CustomNod
       const name = node.type.name;
       const events = [];
 
-      const nextFn = (newContext) => {
+      const nextFn = async (newContext) => {
+        updateQueue = arrayUnique(events.concat(updateQueue));
         Object.assign(currentContext, newContext);
-        events.forEach((fn) => fn());
+
+        setZeroTimeout(() => {
+          const cache = updateQueue.slice();
+          updateQueue = [];
+          cache.forEach((event) => {
+            event.next();
+          });
+        });
       };
-      currentContext.__update = () => nextFn.call(currentContext);
+      currentContext.__update = async () => await nextFn.call(currentContext);
       const ctx = [currentContext, nextFn];
 
       return currentNode = await render(node.children, {
@@ -55,9 +67,12 @@ export async function render(node, context = {}): Promise<CustomNode | CustomNod
       });
     }
 
+    let next;
+
     const scope = {
       async next() {
         if (output && !output.next) {
+          node.instance = output;
           output = node.type.call(scope, {
             ...node.props,
             children: node.children
@@ -75,7 +90,14 @@ export async function render(node, context = {}): Promise<CustomNode | CustomNod
           throw new Error("`this.next` can not be called initially");
         }
 
-        const next = await output.next();
+        node.instance = {
+          ...next.value,
+          target: currentNode
+        };
+
+        currentNode.history = node.instance
+
+        next = await output.next();
         return (currentNode = await patch(next.value, currentNode, 2, context));
       },
       async *[(Symbol as any).asyncIterator]() {
@@ -93,7 +115,7 @@ export async function render(node, context = {}): Promise<CustomNode | CustomNod
     });
 
     if (output.next && output.throw && output.return) {
-      let next = await output.next();
+      next = await output.next();
       let outputIsContext = Object.getPrototypeOf(next.value) === Context;
 
       if (outputIsContext) {
@@ -105,7 +127,9 @@ export async function render(node, context = {}): Promise<CustomNode | CustomNod
             throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
           }
 
-          currentContext[1].push(scope.next);
+          if (currentContext[1].indexOf(scope) === -1) {
+            currentContext[1].push(scope);
+          }
 
           next = await output.next(currentContext[0]);
 

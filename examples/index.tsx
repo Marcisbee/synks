@@ -207,17 +207,15 @@ function ContextApp() {
     <div>
       {/* <Comp /> */}
       <CountContext>
-        <div>
-          <NumberContext>
-            {Math.random().toString()}
-            <CountButton />
-            <Comp />
-            <hr />
-            <Comp />
-          </NumberContext>
-        </div>
+        <NumberContext>
+          {Math.random().toString()}
+          <CountButton />
+          <Comp />
+          <hr />
+          <Comp />
+        </NumberContext>
       </CountContext>
-    </div>
+    </div >
   );
 }
 
@@ -233,6 +231,52 @@ function* CountButton() {
   }
 }
 
+
+class CountContext2 extends Synks.Context {
+  count = 0;
+  constructor() {
+    super();
+    // const next = () =>
+    //   requestAnimationFrame(() => {
+    //     this.increment();
+    //     next();
+    //   });
+    // next();
+    setInterval(() => {
+      this.increment();
+    }, 1000);
+  }
+  increment() {
+    this.count += 1;
+  }
+}
+
+function* Header() {
+  const [countContext] = yield CountContext2;
+
+  while (true) {
+    yield <h1>{countContext.count}</h1>;
+  }
+}
+
+function* StateCounter() {
+  const [countContext] = yield CountContext2;
+  let clicks = 0;
+
+  const onClick = () => {
+    clicks++;
+    countContext.increment();
+  }
+
+  while (true) {
+    yield (
+      <button onclick={onClick}>
+        add ({countContext.count} : {clicks})
+      </button>
+    );
+  }
+}
+
 (async () => {
   // For HMR
   console.clear();
@@ -240,5 +284,11 @@ function* CountButton() {
 
   // await Synks.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
   await Synks.mount(<App />, document.getElementById('root'));
+  // await Synks.mount(<div>
+  //   <CountContext2>
+  //     <Header />
+  //     <StateCounter />
+  //   </CountContext2>
+  // </div>, document.getElementById('root'));
   // await Synks.mount(<ContextApp />, document.getElementById('root'));
 })();

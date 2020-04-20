@@ -1,7 +1,12 @@
 import { render, CustomNode } from './render';
 import variables from './variables';
+import { Context } from './Context';
 
 export async function patch(node, container, actionType = 0, context): Promise<CustomNode | CustomNode[]> {
+  if (node === undefined) {
+    return;
+  }
+
   const historyInstance = container.history && container.history.type instanceof Function && container.history.instance;
   const history = historyInstance
     ? { ...historyInstance, target: container.history.target }
@@ -68,14 +73,25 @@ export async function patch(node, container, actionType = 0, context): Promise<C
     }
   }
 
-  const element = await render(node, context);
+  if (actionType === 2 && node.type === undefined && container.nodeType === 3) {
+    container.nodeValue = node;
+    return container;
+  }
+
+  const element = node instanceof Node ? node : await render(node, context);
+
+  if (node.type instanceof Context) {
+    return element;
+  }
 
   if (node instanceof Object) {
     if (Array.isArray(element)) {
-      element.forEach((el) => {
-        el.history = node;
+      element.forEach((el, index) => {
+        el.history = {
+          ...node.children[index].instance,
+          target: element,
+        };
       });
-      console.log('boop', node, element);
     } else {
       element.history = node;
     }
@@ -101,7 +117,9 @@ export async function patch(node, container, actionType = 0, context): Promise<C
   }
 
   if (Array.isArray(element)) {
-    return element.map(item => container.appendChild(item));
+    return element.map(item => (
+      patch(item, container, actionType, context)
+    ));
   }
 
   container.appendChild(element);
