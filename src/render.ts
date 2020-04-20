@@ -109,19 +109,6 @@ export async function render(node, context = {}) {
         } while (outputIsContext);
       }
 
-      // if (outputIsContext) {
-      //   const contextName = next.value && next.value.name;
-      //   const currentContext = context[contextName];
-
-      //   if (!currentContext) {
-      //     throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
-      //   }
-
-      //   currentContext[1].push(scope.next);
-
-      //   next = await output.next(currentContext[0]);
-      // }
-
       node.instance = next.value;
 
       currentNode = await render(next.value, context);

@@ -2,14 +2,21 @@
   "name": "sourc",
   "version": "1.0.0",
   "description": "Asynchronous view renderer",
-  "main": "src/index.ts",
+  "main": "dist/sourc.js",
+  "module": "dist/sourc.es.js",
+  "jsnext:main": "dist/sourc.es.js",
   "scripts": {
-    "start": "node fuse"
+    "start": "node fuse",
+    "build": "node fuse build"
   },
   "keywords": [],
   "author": "Marcis <marcisbergmanis@gmail.com> Bergmanis",
   "license": "MIT",
   "dependencies": {
     "fuse-box": "^4.0.0-next.426"
-  }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }
