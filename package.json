@@ -1,14 +1,14 @@
 {
-  "name": "radi-async",
+  "name": "sourc",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Asynchronous view renderer",
+  "main": "src/index.ts",
   "scripts": {
     "start": "node fuse"
   },
   "keywords": [],
-  "author": "",
-  "license": "UNLICENCED",
+  "author": "Marcis <marcisbergmanis@gmail.com> Bergmanis",
+  "license": "MIT",
   "dependencies": {
     "fuse-box": "^4.0.0-next.426"
   }
