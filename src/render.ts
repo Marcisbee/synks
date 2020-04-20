@@ -3,11 +3,15 @@ import { patch } from './patch';
 import { Context } from './Context';
 import variables from './variables';
 
-export async function render(node, context = {}) {
-  if (Array.isArray(node)) {
-    let output = [];
+export interface CustomNode extends Node {
+  history?: unknown;
+}
 
-    for (let child of node) {
+export async function render(node, context = {}): Promise<CustomNode | CustomNode[]> {
+  if (Array.isArray(node)) {
+    const output = [];
+
+    for (const child of node) {
       output.push(await render(child, context));
     }
 

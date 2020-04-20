@@ -4,20 +4,19 @@ class Context {
   isProduction;
   getConfig = () =>
     fusebox({
-      entry: this.isProduction
-        ? 'src/index.ts'
-        : 'examples/index.tsx',
+      entry: '../examples/index.tsx',
       target: 'browser',
-      devServer: !this.isProduction,
-      webIndex: this.isProduction
-        ? false
-        : {
-          template: 'public/index.html',
-        },
+      devServer: true,
+      webIndex: {
+        template: '../public/index.html',
+      },
       compilerOptions: {
         jsxFactory: 'Synks.h',
       },
-      hmr: !this.isProduction,
+      watcher: {
+        include: 'src'
+      },
+      hmr: true,
     })
 }
 
@@ -27,7 +26,7 @@ task('default', async (ctx) => {
   const fuse = ctx.getConfig();
   await fuse.runDev({
     bundles: {
-      distRoot: '.temp',
+      distRoot: '../.temp',
     },
   });
 });

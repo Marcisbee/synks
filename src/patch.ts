@@ -1,7 +1,7 @@
-import { render } from './render';
+import { render, CustomNode } from './render';
 import variables from './variables';
 
-export async function patch(node, container, actionType = 0, context) {
+export async function patch(node, container, actionType = 0, context): Promise<CustomNode | CustomNode[]> {
   const historyInstance = container.history && container.history.type instanceof Function && container.history.instance;
   const history = historyInstance
     ? { ...historyInstance, target: container.history.target }
@@ -9,9 +9,9 @@ export async function patch(node, container, actionType = 0, context) {
   const shouldPatch = !!history;
 
   if (Array.isArray(node)) {
-    let output = [];
+    const output = [];
 
-    for (let child of node) {
+    for (const child of node) {
       output.push(await patch(child, container, actionType, context));
     }
 
@@ -39,7 +39,7 @@ export async function patch(node, container, actionType = 0, context) {
         });
       }
 
-      for (let index in node.children) {
+      for (const index in node.children) {
         const child = node.children[index];
         const childNode = history.target.childNodes[index];
         if (childNode !== undefined) {
@@ -71,7 +71,14 @@ export async function patch(node, container, actionType = 0, context) {
   const element = await render(node, context);
 
   if (node instanceof Object) {
-    element.history = node;
+    if (Array.isArray(element)) {
+      element.forEach((el) => {
+        el.history = node;
+      });
+      console.log('boop', node, element);
+    } else {
+      element.history = node;
+    }
     node.target = element;
   }
 

@@ -7,8 +7,9 @@
   "module": "dist/synks.es.js",
   "jsnext:main": "dist/synks.es.js",
   "scripts": {
-    "start": "node fuse",
-    "build": "rollup -c"
+    "start": "node config/fuse",
+    "build": "rollup -c config/rollup.config.js",
+    "lint": "eslint . --ext .ts"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,9 @@
   },
   "homepage": "https://github.com/Marcisbee/synks#readme",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "eslint": "^6.8.0",
     "fuse-box": "^4.0.0-next.426",
     "rollup": "^1.31.1",
     "rollup-plugin-terser": "^5.3.0",
@@ -30,5 +34,29 @@
   "files": [
     "dist",
     "README.md"
+  ],
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/prefer-namespace-keyword": "off",
+      "@typescript-eslint/no-namespace": "off"
+    }
+  },
+  "eslintIgnore": [
+    "node_modules",
+    "dist",
+    ".temp",
+    ".cache",
+    "examples",
+    "*.js"
   ]
 }
