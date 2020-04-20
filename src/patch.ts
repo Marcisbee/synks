@@ -93,7 +93,7 @@ export async function patch(node, container, actionType = 0, context): Promise<C
         };
       });
     } else {
-      element.history = node;
+      (element as any).history = node;
     }
     node.target = element;
   }
@@ -119,7 +119,7 @@ export async function patch(node, container, actionType = 0, context): Promise<C
   if (Array.isArray(element)) {
     return element.map(item => (
       patch(item, container, actionType, context)
-    ));
+    ) as any);
   }
 
   container.appendChild(element);
