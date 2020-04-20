@@ -1,14 +1,14 @@
 const { fusebox } = require('fuse-box');
 
 const fuse = fusebox({
-  entry: 'src/index.tsx',
+  entry: 'examples/index.tsx',
   target: 'browser',
   devServer: true,
   webIndex: {
-    template: 'index.html',
+    template: 'public/index.html',
   },
   compilerOptions: {
-    jsxFactory: 'Radi.h',
+    jsxFactory: 'Sourc.h',
   },
   hmr: true,
 });
