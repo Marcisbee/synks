@@ -14,7 +14,7 @@ class Context {
         jsxFactory: 'Synks.h',
       },
       watcher: {
-        include: 'src'
+        include: '../src'
       },
       hmr: true,
     })
