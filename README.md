@@ -109,7 +109,7 @@ And finally we can use context to sync multiple components with ony state.
 For this we need to extend `Synks.Context` class to build our own context.
 
 ```jsx
-class CountContext = Synks.Context {
+class CountContext extends Synks.Context {
   count = 0;
   increment() {
     this.count += 1;
