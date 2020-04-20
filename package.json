@@ -1,19 +1,30 @@
 {
   "name": "synks",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Asynchronous view renderer",
   "main": "dist/synks.js",
   "module": "dist/synks.es.js",
   "jsnext:main": "dist/synks.es.js",
   "scripts": {
     "start": "node fuse",
-    "build": "node fuse build"
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marcisbee/synks.git"
   },
   "keywords": [],
-  "author": "Marcis <marcisbergmanis@gmail.com> Bergmanis",
+  "author": "Marcis Bergmanis <marcisbergmanis@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "fuse-box": "^4.0.0-next.426"
+  "bugs": {
+    "url": "https://github.com/Marcisbee/synks/issues"
+  },
+  "homepage": "https://github.com/Marcisbee/synks#readme",
+  "devDependencies": {
+    "fuse-box": "^4.0.0-next.426",
+    "rollup": "^1.31.1",
+    "rollup-plugin-terser": "^5.3.0",
+    "rollup-plugin-typescript2": "^0.27.0"
   },
   "files": [
     "dist",
