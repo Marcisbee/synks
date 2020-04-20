@@ -1,6 +1,6 @@
-# <img src='https://user-images.githubusercontent.com/16621507/79736025-da5dae80-8301-11ea-9980-528f97c7331d.png' height='46' alt='Sourc' />
+# <img src='https://user-images.githubusercontent.com/16621507/79747308-17cb3780-8314-11ea-9126-f747ae1a24b5.png' height='46' alt='Synks' />
 
-**Sourc** is a tiny javascript view renderer, that is built async first components.
+**Synks** is a tiny javascript view renderer, that is built async first components.
 
 It uses JSX/hyperscript for it's templating.
 Functions, promises and generators for component composition. And classes for contexts.
@@ -12,18 +12,18 @@ Functions, promises and generators for component composition. And classes for co
 To install the stable version:
 
 ```
-npm install --save sourc
+npm install --save synks
 ```
 
-This assumes you are using [npm](https://www.npmjs.com/) as your package manager.
+This assumes you are using [npm](https://www.npmjs.com/synks) as your package manager.
 
-If you're not, you can [access these files on unpkg](https://unpkg.com/sourc/dist/), download them, or point your package manager to them.
+If you're not, you can [access these files on unpkg](https://unpkg.com/synks/dist/), download them, or point your package manager to them.
 
 ## Documentation
 
 <!-- [Getting started guide](/docs) -->
 
-I'm assuming you already know what JSX is and how to set it up with custom pragma (`Sourc.h`), so let's cut the chase and start with component composition.
+I'm assuming you already know what JSX is and how to set it up with custom pragma (`Synks.h`), so let's cut the chase and start with component composition.
 
 #### Hello World example
 
@@ -34,7 +34,7 @@ function Hello({ what }) {
   return <h1>Hello {what}</h1>;
 }
 
-Sourc.mount(<Hello what="World" />, document.body);
+Synks.mount(<Hello what="World" />, document.body);
 ```
 
 This example will mount h1 to body like so `<body><h1>Hello World</h1></body>`
@@ -106,10 +106,10 @@ This will not stop DOM rendering at async components.
 #### Context example
 
 And finally we can use context to sync multiple components with ony state.
-For this we need to extend `Sourc.Context` class to build our own context.
+For this we need to extend `Synks.Context` class to build our own context.
 
 ```jsx
-class CountContext = Sourc.Context {
+class CountContext = Synks.Context {
   count = 0;
   increment() {
     this.count += 1;
@@ -122,7 +122,7 @@ class CountContext = Sourc.Context {
 Now let's use this context.
 
 ```jsx
-Sourc.mount(
+Synks.mount(
   <div>
     <CountContext>
       <StateCounter />
@@ -160,7 +160,7 @@ _NOTE_: Do not destruct `countContext` as it will be transformed to simple value
 
 ## Architecture
 
-Sourc renders everything to DOM asyncronously. This means every exported method except `h` returns Promise. It waits for every component in it's child tree to be ready and only then it renders it.
+Synks renders everything to DOM asyncronously. This means every exported method except `h` returns Promise. It waits for every component in it's child tree to be ready and only then it renders it.
 
 This is poverful when using async data fetching and syncing all dom tree together.
 

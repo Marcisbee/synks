@@ -1,10 +1,10 @@
 {
-  "name": "sourc",
+  "name": "synks",
   "version": "1.0.0",
   "description": "Asynchronous view renderer",
-  "main": "dist/sourc.js",
-  "module": "dist/sourc.es.js",
-  "jsnext:main": "dist/sourc.es.js",
+  "main": "dist/synks.js",
+  "module": "dist/synks.es.js",
+  "jsnext:main": "dist/synks.es.js",
   "scripts": {
     "start": "node fuse",
     "build": "node fuse build"

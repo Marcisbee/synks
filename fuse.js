@@ -16,7 +16,7 @@ class Context {
           template: 'public/index.html',
         },
       compilerOptions: {
-        jsxFactory: 'Sourc.h',
+        jsxFactory: 'Synks.h',
       },
       hmr: !this.isProduction,
     })
@@ -37,26 +37,26 @@ task('build', async (ctx) => {
   await fuse.runProd({
     buildTarget: 'ES5',
     bundles: {
-      app: { path: 'sourc.js' },
+      app: { path: 'synks.js' },
     },
     uglify: false,
   });
   await fuse.runProd({
     buildTarget: 'ES5',
     bundles: {
-      app: { path: 'sourc.min.js' },
+      app: { path: 'synks.min.js' },
     },
     uglify: true,
   });
   await fuse.runProd({
     bundles: {
-      app: { path: 'sourc.es.js' },
+      app: { path: 'synks.es.js' },
     },
     uglify: false,
   });
   await fuse.runProd({
     bundles: {
-      app: { path: 'sourc.es.min.js' },
+      app: { path: 'synks.es.min.js' },
     },
     uglify: true,
   });

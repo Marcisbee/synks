@@ -1,4 +1,4 @@
-import * as Sourc from '../src';
+import * as Synks from '../src';
 import { getMovieList } from './api';
 
 import './app.css';
@@ -166,14 +166,14 @@ function number2words(n) {
   if (n < 1000) return num[~~(n / 100)] + " hundred" + (n % 100 == 0 ? "" : " " + number2words(n % 100));
   return number2words(~~(n / 1000)) + " thousand" + (n % 1000 != 0 ? " " + number2words(n % 1000) : "");
 }
-class NumberContext extends Sourc.Context {
+class NumberContext extends Synks.Context {
   name = 'zero';
   toWord(number) {
     this.name = number2words(number);
   }
 }
 
-class CountContext extends Sourc.Context {
+class CountContext extends Synks.Context {
   count = 0;
   increment() {
     return this.count += 1;
@@ -238,7 +238,7 @@ function* CountButton() {
   console.clear();
   document.body.innerHTML = 'Rendering started..<br/><br/><div id="root"></div>';
 
-  // await Sourc.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
-  await Sourc.mount(<App />, document.getElementById('root'));
-  // await Sourc.mount(<ContextApp />, document.getElementById('root'));
+  // await Synks.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
+  await Synks.mount(<App />, document.getElementById('root'));
+  // await Synks.mount(<ContextApp />, document.getElementById('root'));
 })();

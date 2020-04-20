@@ -11,7 +11,7 @@ export async function mount(node, container = document.body) {
   try {
     output = await patch(node, container, 0, {});
   } catch (e) {
-    console.error("[Sourc]", e);
+    console.error("[Synks]", e);
   }
 
   return output;
