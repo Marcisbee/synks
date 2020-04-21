@@ -1,4 +1,4 @@
-# <img src='https://user-images.githubusercontent.com/16621507/79747308-17cb3780-8314-11ea-9126-f747ae1a24b5.png' height='46' alt='Synks' />
+# <img src='https://user-images.githubusercontent.com/16621507/79747308-17cb3780-8314-11ea-9126-f747ae1a24b5.png' height='67' alt='Synks' />
 
 **Synks** is a tiny javascript view renderer, that is built async first components.
 
