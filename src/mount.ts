@@ -1,18 +1,13 @@
-import { patch } from './patch';
+import { render } from "./render";
 
-/**
- * 0 = append
- * 1 = after
- * 2 = replace
- */
-export async function mount(node, container = document.body) {
-  let output;
-
-  try {
-    output = await patch(node, container, 0, {});
-  } catch (e) {
-    console.error("[Synks]", e);
+export async function mount(
+  node: VNode | VNode[],
+  container: HTMLElement = document.body,
+  previousNode: VNode | VNode[] = node.constructor()
+): Promise<VNode | VNode[]> {
+  if (!(node instanceof Array)) {
+    node = [node];
   }
 
-  return output;
+  return await render(node, previousNode as any, container, 0, {});
 }

@@ -1,184 +1,152 @@
-import { setProps } from './set-props';
-import { patch } from './patch';
-import { Context } from './Context';
-import variables from './variables';
-import { setZeroTimeout } from './utils/set-zero-timeout';
-import { arrayUnique } from './utils/array-unique';
+import { renderChildren } from "./remove-children";
+import { patchProps } from "./patch-props";
+import { build } from "./build";
+import { removeStranglers } from "./remove-stranglers";
+import { removeNode } from "./remove-node";
 
-export interface CustomNode extends Node {
-  history?: unknown;
-}
-
-let updateQueue = [];
-
-export async function render(node, context = {}): Promise<CustomNode | CustomNode[]> {
-  if (Array.isArray(node)) {
-    const output = [];
-
-    for (const child of node) {
-      output.push(await render(child, context));
-    }
-
-    return output;
+export async function render(
+  currentNode: VNode | VNode[],
+  previousNode: VNode = currentNode.constructor(),
+  container: HTMLElement,
+  childIndex: number,
+  context: Context
+): Promise<VNode | VNode[]> {
+  if (currentNode instanceof Array) {
+    return await renderChildren(currentNode, previousNode, container, childIndex, context);
   }
 
-  if (node === undefined) {
-    return document.createComment("");
+  // Destroy previous component
+  if (previousNode.scope) {
+    await previousNode.scope.destroy();
   }
 
-  if (node instanceof Promise) {
-    const placeholder = document.createComment("");
-    const output = await node;
+  // Component
+  if (currentNode.type instanceof Function) {
+    currentNode.target = container;
 
-    patch(output, placeholder, 1, context);
-
-    return placeholder;
-  }
-
-  if (node.type instanceof Function) {
-    const isContext = Object.getPrototypeOf(node.type) === Context;
-    let currentNode;
-    let asyncIterator;
-    let output;
-
-    if (isContext) {
-      const currentContext = new node.type(node.props);
-      const name = node.type.name;
-      const events = [];
-
-      const nextFn = async (newContext) => {
-        updateQueue = arrayUnique(events.concat(updateQueue));
-        Object.assign(currentContext, newContext);
-
-        setZeroTimeout(() => {
-          const cache = updateQueue.slice();
-          updateQueue = [];
-          cache.forEach((event) => {
-            event.next();
-          });
-        });
-      };
-      currentContext.__update = async () => await nextFn.call(currentContext);
-      const ctx = [currentContext, nextFn];
-
-      return currentNode = await render(node.children, {
-        ...context,
-        [name]: [ctx, events],
-      });
-    }
-
-    let next;
-
-    const scope = {
+    // Regular component
+    let output: VNode | VNode[];
+    const scope: Scope = {
+      times: 0,
+      name: currentNode.type.name,
+      mounted: true,
+      _c: [],
       async next() {
-        if (output && !output.next) {
-          node.instance = output;
-          output = node.type.call(scope, {
-            ...node.props,
-            children: node.children
-          });
-
-          return (currentNode = await patch(
-            output,
-            currentNode,
-            2,
-            context
-          ));
+        scope.times++;
+        if (!scope.mounted) {
+          return;
         }
 
-        if (!currentNode) {
-          throw new Error("`this.next` can not be called initially");
-        }
-
-        node.instance = {
-          ...next.value,
-          target: currentNode
-        };
-
-        currentNode.history = node.instance
-
-        next = await output.next();
-        return (currentNode = await patch(next.value, currentNode, 2, context));
+        await render(
+          currentNode,
+          previousNode,
+          container,
+          childIndex,
+          context,
+        );
       },
-      async *[(Symbol as any).asyncIterator]() {
-        asyncIterator = true;
-        yield {
-          ...node.props,
-          children: node.children
-        };
-      }
+      // async *[(Symbol as any).asyncIterator]() {
+      //   asyncIterator = true;
+      //   yield {
+      //     ...node.props,
+      //     children: node.children
+      //   };
+      // },
+      async destroy() {
+        if (!scope.mounted) {
+          return;
+        }
+
+        scope.mounted = false;
+
+        scope._c.forEach((s) => {
+          s.destroy();
+        });
+        scope._c = [];
+
+        const parentScopes = context.scope && context.scope._c;
+        if (parentScopes) {
+          context.scope._c = parentScopes.filter((s) => s.mounted);
+        }
+      },
     };
 
-    output = node.type.call(scope, {
-      ...node.props,
-      children: node.children
+    if (context.scope) {
+      context.scope._c.push(scope);
+    }
+
+    const newContext = Object.assign({}, context, {
+      scope,
     });
 
-    if (output.next && output.throw && output.return) {
-      next = await output.next();
-      let outputIsContext = Object.getPrototypeOf(next.value) === Context;
+    const props = Object.assign({}, currentNode.props, {
+      children: currentNode.children,
+    });
 
-      if (outputIsContext) {
-        do {
-          const contextName = next.value && next.value.name;
-          const currentContext = context[contextName];
+    currentNode.scope = scope;
 
-          if (!currentContext) {
-            throw new Error(`${contextName} was called in <${node.type.name}> before it was defined`);
-          }
+    const fn = currentNode.type;
+    // eslint-disable-next-line no-inner-declarations
+    async function renderSelf(previousTree: VNode | VNode[]): Promise<VNode | VNode[]> {
+      output = fn.call(scope, props);
 
-          if (currentContext[1].indexOf(scope) === -1) {
-            currentContext[1].push(scope);
-          }
+      const rendered = await render(output, previousTree as any, container, childIndex, newContext);
+      (currentNode as any).instance = output;
 
-          next = await output.next(currentContext[0]);
+      Object.assign(previousNode, currentNode);
 
-          outputIsContext = Object.getPrototypeOf(next.value) === Context;
-        } while (outputIsContext);
-      }
+      previousNode.target = null;
 
-      node.instance = next.value;
-
-      currentNode = await render(next.value, context);
-
-      if (asyncIterator) {
-        scope.next();
-      }
-
-      return currentNode;
+      return rendered;
     }
 
-    node.instance = output;
+    await renderSelf(previousNode.instance || previousNode);
 
-    return (currentNode = await render(output, context));
+    return currentNode;
   }
 
-  if (typeof node.type === "string") {
-    let element;
-    if (node.type === "svg" || variables.parent instanceof SVGElement) {
-      element = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        node.type
-      );
-    } else {
-      element = document.createElement(node.type);
-    }
-
-    // set attributes
-    setProps(element, node.props);
-
-    await patch(node.children, element, 0, context);
-
-    return element;
+  if (previousNode.instance) {
+    removeNode(previousNode.instance);
   }
 
-  if (typeof node === "string" || typeof node === "number") {
-    return document.createTextNode(String(node));
+  const isKeyMoved = currentNode.target && previousNode.key !== undefined && previousNode.key !== null;
+
+  currentNode.target = await build(currentNode, previousNode, container);
+
+  // Patch props
+  patchProps(currentNode, previousNode);
+
+  if (isKeyMoved) {
+    container.insertBefore(
+      currentNode.target,
+      container.childNodes[childIndex + 1]
+    );
+
+    return currentNode;
   }
 
-  if (!node) {
-    return;
+  if (currentNode.target === previousNode.target || (previousNode.instance && previousNode.target === container)) {
+    previousNode.target = null;
   }
 
-  return (document.createTextNode(node.toString()));
+  // Patch children
+  await renderChildren(currentNode.children, previousNode.children, currentNode.target as HTMLElement, 0, context);
+
+  // Remove stranglers
+  if (previousNode.target && previousNode.target.parentNode && previousNode.target !== currentNode.target && previousNode.target !== container) {
+    removeNode(previousNode);
+  }
+  if (previousNode && previousNode.children) {
+    removeStranglers(previousNode.children);
+  }
+
+  // Add element to dom
+  if (!currentNode.target.parentNode) {
+    container.insertBefore(
+      currentNode.target,
+      container.childNodes[childIndex]
+    );
+  }
+
+  return currentNode;
 }

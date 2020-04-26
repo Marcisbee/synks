@@ -138,20 +138,20 @@ function App() {
           swap 2nd ↔ 2nd last
         </button>
         <div class="kids">{kids}</div>
-        <Suspense fallback={<Loading />}>
+        {/* <Suspense fallback={<Loading />}>
           lalala
           <div>
             <h2>asd</h2>
             <MovieList />
           </div>
-        </Suspense>
+        </Suspense> */}
       </div>
       --
       <Counter initial={0} />
       after
       <hr />
       Context:
-      <ContextApp />
+      {/* <ContextApp /> */}
     </div>
   );
 }
@@ -166,58 +166,58 @@ function number2words(n) {
   if (n < 1000) return num[~~(n / 100)] + " hundred" + (n % 100 == 0 ? "" : " " + number2words(n % 100));
   return number2words(~~(n / 1000)) + " thousand" + (n % 1000 != 0 ? " " + number2words(n % 1000) : "");
 }
-class NumberContext extends Synks.Context {
-  name = 'zero';
-  toWord(number) {
-    this.name = number2words(number);
-  }
-}
+// class NumberContext extends Synks.Context {
+//   name = 'zero';
+//   toWord(number) {
+//     this.name = number2words(number);
+//   }
+// }
 
-class CountContext extends Synks.Context {
-  count = 0;
-  increment() {
-    return this.count += 1;
-  }
-}
+// class CountContext extends Synks.Context {
+//   count = 0;
+//   increment() {
+//     return this.count += 1;
+//   }
+// }
 
-function* Comp() {
-  const [countContext, next] = yield CountContext;
-  // @TODO: Do multiple contexts
-  const [numberContext] = yield NumberContext;
+// function* Comp() {
+//   const [countContext, next] = yield CountContext;
+//   // @TODO: Do multiple contexts
+//   const [numberContext] = yield NumberContext;
 
-  while (true) {
-    yield (
-      <div>
-        <h1 className={countContext.count}>
-          {countContext.count} ({numberContext.name}) <CountButton />
-        </h1>
-        <button onclick={() => numberContext.toWord(countContext.increment())}>
-          +
-        </button>
-        <button onclick={() => { next({ count: countContext.count - 1 }) }}>
-          -
-        </button>
-      </div>
-    )
-  }
-}
+//   while (true) {
+//     yield (
+//       <div>
+//         <h1 className={countContext.count}>
+//           {countContext.count} ({numberContext.name}) <CountButton />
+//         </h1>
+//         <button onclick={() => numberContext.toWord(countContext.increment())}>
+//           +
+//         </button>
+//         <button onclick={() => { next({ count: countContext.count - 1 }) }}>
+//           -
+//         </button>
+//       </div>
+//     )
+//   }
+// }
 
-function ContextApp() {
-  return (
-    <div>
-      {/* <Comp /> */}
-      <CountContext>
-        <NumberContext>
-          {Math.random().toString()}
-          <CountButton />
-          <Comp />
-          <hr />
-          <Comp />
-        </NumberContext>
-      </CountContext>
-    </div >
-  );
-}
+// function ContextApp() {
+//   return (
+//     <div>
+//       {/* <Comp /> */}
+//       <CountContext>
+//         <NumberContext>
+//           {Math.random().toString()}
+//           <CountButton />
+//           <Comp />
+//           <hr />
+//           <Comp />
+//         </NumberContext>
+//       </CountContext>
+//     </div >
+//   );
+// }
 
 function* CountButton() {
   let count = 0;
@@ -232,50 +232,50 @@ function* CountButton() {
 }
 
 
-class CountContext2 extends Synks.Context {
-  count = 0;
-  constructor() {
-    super();
-    // const next = () =>
-    //   requestAnimationFrame(() => {
-    //     this.increment();
-    //     next();
-    //   });
-    // next();
-    setInterval(() => {
-      this.increment();
-    }, 1000);
-  }
-  increment() {
-    this.count += 1;
-  }
-}
+// class CountContext2 extends Synks.Context {
+//   count = 0;
+//   constructor() {
+//     super();
+//     // const next = () =>
+//     //   requestAnimationFrame(() => {
+//     //     this.increment();
+//     //     next();
+//     //   });
+//     // next();
+//     setInterval(() => {
+//       this.increment();
+//     }, 1000);
+//   }
+//   increment() {
+//     this.count += 1;
+//   }
+// }
 
-function* Header() {
-  const [countContext] = yield CountContext2;
+// function* Header() {
+//   const [countContext] = yield CountContext2;
 
-  while (true) {
-    yield <h1>{countContext.count}</h1>;
-  }
-}
+//   while (true) {
+//     yield <h1>{countContext.count}</h1>;
+//   }
+// }
 
-function* StateCounter() {
-  const [countContext] = yield CountContext2;
-  let clicks = 0;
+// function* StateCounter() {
+//   const [countContext] = yield CountContext2;
+//   let clicks = 0;
 
-  const onClick = () => {
-    clicks++;
-    countContext.increment();
-  }
+//   const onClick = () => {
+//     clicks++;
+//     countContext.increment();
+//   }
 
-  while (true) {
-    yield (
-      <button onclick={onClick}>
-        add ({countContext.count} : {clicks})
-      </button>
-    );
-  }
-}
+//   while (true) {
+//     yield (
+//       <button onclick={onClick}>
+//         add ({countContext.count} : {clicks})
+//       </button>
+//     );
+//   }
+// }
 
 (async () => {
   // For HMR
