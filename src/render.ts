@@ -1,4 +1,4 @@
-import { renderChildren } from "./remove-children";
+import { renderChildren } from "./render-children";
 import { patchProps } from "./patch-props";
 import { build } from "./build";
 import { removeStranglers } from "./remove-stranglers";
