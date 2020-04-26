@@ -5,7 +5,12 @@ export function transformChildren(children: (VNode | string)[]): VNode[] {
     }
 
     if (child instanceof Object) {
-      return child;
+      return {
+        type: child.type,
+        props: child.props,
+        key: child.key,
+        children: child.children,
+      };
     }
 
     return {
