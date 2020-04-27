@@ -2,7 +2,9 @@ interface Scope {
   name: string;
   _c: Scope[];
   mounted: boolean;
+  rendering: boolean;
   next: () => Promise<void>;
+  nextProps: (props: null | Record<string, any>) => Promise<void>;
   destroy: () => Promise<void>;
 
   [key: string]: any;

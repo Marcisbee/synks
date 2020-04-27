@@ -3,6 +3,7 @@ import { patchProps } from "./patch-props";
 import { build } from "./build";
 import { removeStranglers } from "./remove-stranglers";
 import { removeNode } from "./remove-node";
+import { quickEqual } from "./quick-equal";
 
 export async function render(
   currentNode: VNode | VNode[],
@@ -15,35 +16,68 @@ export async function render(
     return await renderChildren(currentNode, previousNode, container, childIndex, context);
   }
 
-  // Destroy previous component
-  if (previousNode.scope) {
-    await previousNode.scope.destroy();
-  }
-
   // Component
   if (currentNode.type instanceof Function) {
-    currentNode.target = container;
+    if (currentNode.type === previousNode.type && !!previousNode.instance) {
+      const props = Object.assign({}, currentNode.props, {
+        children: currentNode.children,
+      });
+
+      const props2 = Object.assign({}, previousNode.props, {
+        children: previousNode.children,
+      });
+
+      const key1 = currentNode.key;
+      const key2 = previousNode.key;
+
+      const output = Object.assign(currentNode, previousNode);
+
+      if (key1 === key2 || quickEqual(props, props2)) {
+        return output;
+      }
+
+      await output.scope.nextProps(props);
+
+      return output;
+    }
+
+    // Destroy previous component
+    if (previousNode.scope) {
+      await previousNode.scope.destroy();
+    }
 
     // Regular component
+    const fn = currentNode.type;
     let output: VNode | VNode[];
+    let originalProps = Object.assign({}, currentNode.props, {
+      children: currentNode.children,
+    });
+
     const scope: Scope = {
-      times: 0,
-      name: currentNode.type.name,
       mounted: true,
+      rendering: false,
       _c: [],
       async next() {
-        scope.times++;
-        if (!scope.mounted) {
+        if (!scope.mounted || scope.rendering) {
           return;
         }
+        scope.rendering = true;
 
-        await render(
-          currentNode,
-          previousNode,
-          container,
-          childIndex,
-          context,
-        );
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        await renderSelf(previousNode.instance, originalProps);
+
+        scope.rendering = false;
+      },
+      async nextProps(props) {
+        if (!scope.mounted || scope.rendering) {
+          return;
+        }
+        scope.rendering = true;
+
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        await renderSelf(previousNode.instance, props);
+
+        scope.rendering = false;
       },
       // async *[(Symbol as any).asyncIterator]() {
       //   asyncIterator = true;
@@ -79,30 +113,32 @@ export async function render(
       scope,
     });
 
-    const props = Object.assign({}, currentNode.props, {
-      children: currentNode.children,
-    });
-
     currentNode.scope = scope;
 
-    const fn = currentNode.type;
     // eslint-disable-next-line no-inner-declarations
-    async function renderSelf(previousTree: VNode | VNode[]): Promise<VNode | VNode[]> {
-      output = fn.call(scope, props);
+    async function renderSelf(previousTree: VNode | VNode[], props: null | Record<string, any> = originalProps): Promise<VNode | VNode[]> {
+      originalProps = props;
+
+      output = await fn.call(scope, props);
 
       const rendered = await render(output, previousTree as any, container, childIndex, newContext);
       (currentNode as any).instance = output;
 
       Object.assign(previousNode, currentNode);
+      Object.assign(previousTree, rendered);
 
       previousNode.target = null;
 
       return rendered;
     }
 
-    await renderSelf(previousNode.instance || previousNode);
+    await renderSelf(previousNode);
 
     return currentNode;
+  }
+
+  if (previousNode.scope) {
+    await previousNode.scope.destroy();
   }
 
   if (previousNode.instance) {

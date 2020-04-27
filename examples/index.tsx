@@ -138,13 +138,13 @@ function App() {
           swap 2nd ↔ 2nd last
         </button>
         <div class="kids">{kids}</div>
-        {/* <Suspense fallback={<Loading />}>
+        {/* <Suspense fallback={<Loading />}> */}
           lalala
           <div>
-            <h2>asd</h2>
-            <MovieList />
-          </div>
-        </Suspense> */}
+          <h2>asd</h2>
+          <MovieList />
+        </div>
+        {/* </Suspense> */}
       </div>
       --
       <Counter initial={0} />
