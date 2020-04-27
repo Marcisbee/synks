@@ -49,23 +49,43 @@ function* Counter({ initial }) {
 
   while (mounted) {
     const randomNumber = Math.round(Math.random() * 10);
-    yield (
-      <div>
-        <h1>
-          {count} - {randomNumber}
-        </h1>
+    if (count === 2) {
+      yield (
+        <section>
+          <h1>
+            {count} - {randomNumber}
+          </h1>
         [
-        {new Array(count + 1).fill(1).map(() => (
-          <strong>*</strong>
-        ))}
+          {new Array(count + 1).fill(1).map(() => (
+            <strong>*</strong>
+          ))}
         ]
-        <button onclick={decrement} disabled={count <= 0}>
-          -
+          <button onclick={decrement} disabled={count <= 0}>
+            -
         </button>
-        <button onclick={increment}>+</button>
-        <button onclick={unmount}>unmount</button>
-      </div>
-    );
+          <button onclick={increment}>+</button>
+          <button onclick={unmount}>unmount</button>
+        </section>
+      );
+    } else {
+      yield (
+        <div>
+          <h1>
+            {count} - {randomNumber}
+          </h1>
+        [
+          {new Array(count + 1).fill(1).map(() => (
+            <strong>*</strong>
+          ))}
+        ]
+          <button onclick={decrement} disabled={count <= 0}>
+            -
+        </button>
+          <button onclick={increment}>+</button>
+          <button onclick={unmount}>unmount</button>
+        </div>
+      );
+    }
   }
 
   return <div>Done</div>;
@@ -138,13 +158,13 @@ function App() {
           swap 2nd ↔ 2nd last
         </button>
         <div class="kids">{kids}</div>
-        {/* <Suspense fallback={<Loading />}> */}
+        <Suspense fallback={<Loading />}>
           lalala
           <div>
-          <h2>asd</h2>
-          <MovieList />
-        </div>
-        {/* </Suspense> */}
+            <h2>asd</h2>
+            <MovieList />
+          </div>
+        </Suspense>
       </div>
       --
       <Counter initial={0} />

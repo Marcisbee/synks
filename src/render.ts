@@ -7,6 +7,8 @@ import { quickEqual } from "./quick-equal";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const GeneratorFunction = (function* () { }).constructor;
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const AsyncGeneratorFunction = (async function* () { }).constructor;
 
 export async function render(
   currentNode: VNode | VNode[],
@@ -64,12 +66,8 @@ export async function render(
         if (!scope.mounted || scope.rendering) {
           return;
         }
-        scope.rendering = true;
 
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        await renderSelf(previousNode.instance, originalProps);
-
-        scope.rendering = false;
+        await this.nextProps(originalProps);
       },
       async nextProps(props) {
         if (!scope.mounted || scope.rendering) {
@@ -82,13 +80,13 @@ export async function render(
 
         scope.rendering = false;
       },
-      // async *[(Symbol as any).asyncIterator]() {
-      //   asyncIterator = true;
-      //   yield {
-      //     ...node.props,
-      //     children: node.children
-      //   };
-      // },
+      async *[(Symbol as any).asyncIterator]() {
+        if (fn instanceof AsyncGeneratorFunction) {
+          scope.next();
+        }
+
+        yield originalProps;
+      },
       async destroy() {
         if (!scope.mounted) {
           return;
@@ -124,11 +122,11 @@ export async function render(
       Object.assign(originalProps, props);
 
       // Generator component
-      if (fn instanceof GeneratorFunction && typeof fn === 'function') {
+      if ((fn instanceof AsyncGeneratorFunction || fn instanceof GeneratorFunction) && typeof fn === 'function') {
         if (!generator) {
           generator = await fn.call(scope, props);
         }
-        output = generator.next().value;
+        output = (await generator.next()).value;
       } else {
         output = await fn.call(scope, props);
       }
