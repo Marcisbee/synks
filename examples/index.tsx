@@ -59,11 +59,11 @@ function* Counter({ initial }) {
           <strong>*</strong>
         ))}
         ]
-        <button onClick={decrement} disabled={count <= 0}>
+        <button onclick={decrement} disabled={count <= 0}>
           -
         </button>
-        <button onClick={increment}>+</button>
-        <button onClick={unmount}>unmount</button>
+        <button onclick={increment}>+</button>
+        <button onclick={unmount}>unmount</button>
       </div>
     );
   }

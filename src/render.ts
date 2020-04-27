@@ -5,6 +5,9 @@ import { removeStranglers } from "./remove-stranglers";
 import { removeNode } from "./remove-node";
 import { quickEqual } from "./quick-equal";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const GeneratorFunction = (function* () { }).constructor;
+
 export async function render(
   currentNode: VNode | VNode[],
   previousNode: VNode = currentNode.constructor(),
@@ -47,9 +50,9 @@ export async function render(
     }
 
     // Regular component
-    const fn = currentNode.type;
     let output: VNode | VNode[];
-    let originalProps = Object.assign({}, currentNode.props, {
+    const fn = currentNode.type;
+    const originalProps = Object.assign({}, currentNode.props, {
       children: currentNode.children,
     });
 
@@ -115,11 +118,20 @@ export async function render(
 
     currentNode.scope = scope;
 
+    let generator = null;
     // eslint-disable-next-line no-inner-declarations
     async function renderSelf(previousTree: VNode | VNode[], props: null | Record<string, any> = originalProps): Promise<VNode | VNode[]> {
-      originalProps = props;
+      Object.assign(originalProps, props);
 
-      output = await fn.call(scope, props);
+      // Generator component
+      if (fn instanceof GeneratorFunction && typeof fn === 'function') {
+        if (!generator) {
+          generator = await fn.call(scope, props);
+        }
+        output = generator.next().value;
+      } else {
+        output = await fn.call(scope, props);
+      }
 
       const rendered = await render(output, previousTree as any, container, childIndex, newContext);
       (currentNode as any).instance = output;
