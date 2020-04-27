@@ -297,6 +297,32 @@ function* CountButton() {
 //   }
 // }
 
+function* Test() {
+  yield (
+    <div onclick={() => this.next()}>
+      Hello world
+    </div>
+  )
+  yield (
+    <div onclick={() => this.next()}>
+      <strong>aaa</strong>
+      Hello world
+    </div>
+  )
+  yield (
+    <section onclick={() => this.next()}>
+      <strong>bbb</strong>
+      {[1, 2, 3]}
+    </section>
+  )
+  yield (
+    <div onclick={() => this.next()}>
+      <strong>aaa</strong>
+      Hello world
+    </div>
+  )
+}
+
 (async () => {
   // For HMR
   console.clear();
@@ -304,6 +330,7 @@ function* CountButton() {
 
   // await Synks.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
   await Synks.mount(<App />, document.getElementById('root'));
+  // await Synks.mount(<Test />, document.getElementById('root'));
   // await Synks.mount(<div>
   //   <CountContext2>
   //     <Header />

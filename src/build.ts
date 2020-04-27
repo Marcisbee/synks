@@ -3,6 +3,13 @@ export async function build(
   previousNode: VNode,
   container: Node,
 ): Promise<TargetElement> {
+  const underSameParent = !!Array.prototype.slice.call(container.childNodes).find(t => t === previousNode.target);
+
+  if (!underSameParent) {
+    previousNode.props = {};
+    previousNode.key = null;
+  }
+
   if (currentNode.target) {
     return currentNode.target;
   }
@@ -15,7 +22,7 @@ export async function build(
     }
 
     // Patch text node
-    if (previousNode && previousNode.type === '' && previousNode.target
+    if (underSameParent && previousNode && previousNode.type === '' && previousNode.target
       && previousNode.target.parentNode === container) {
       // Patch node content
       if (currentNode.props !== previousNode.props) {
@@ -30,7 +37,7 @@ export async function build(
   }
 
   // Patch node
-  if (previousNode && previousNode.target && currentNode.type === previousNode.type) {
+  if (underSameParent && previousNode && previousNode.target && currentNode.type === previousNode.type) {
     return previousNode.target;
   }
 

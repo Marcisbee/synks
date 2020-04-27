@@ -81,9 +81,6 @@ export async function render(
         scope.rendering = false;
       },
       async *[(Symbol as any).asyncIterator]() {
-        if (fn instanceof AsyncGeneratorFunction) {
-          scope.next();
-        }
 
         yield originalProps;
       },
@@ -117,6 +114,7 @@ export async function render(
     currentNode.scope = scope;
 
     let generator = null;
+    let placeholder = null;
     // eslint-disable-next-line no-inner-declarations
     async function renderSelf(previousTree: VNode | VNode[], props: null | Record<string, any> = originalProps): Promise<VNode | VNode[]> {
       Object.assign(originalProps, props);
@@ -126,16 +124,34 @@ export async function render(
         if (!generator) {
           generator = await fn.call(scope, props);
         }
+
         output = (await generator.next()).value;
       } else {
         output = await fn.call(scope, props);
       }
 
+      if (fn instanceof AsyncGeneratorFunction) {
+        scope.nextProps(output.instance);
+      }
+
       const rendered = await render(output, previousTree as any, container, childIndex, newContext);
       (currentNode as any).instance = output;
 
+      if (fn instanceof AsyncGeneratorFunction) {
+        if (placeholder) {
+          removeNode(placeholder);
+          placeholder = null;
+        }
+
+        if (previousNode.instance && output.target !== previousNode.instance.target) {
+          placeholder = previousNode.instance;
+        }
+      }
+
       Object.assign(previousNode, currentNode);
-      Object.assign(previousTree, rendered);
+      if (previousTree) {
+        Object.assign(previousTree, rendered);
+      }
 
       previousNode.target = null;
 
