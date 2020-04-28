@@ -1,4 +1,6 @@
-import { asyncMap } from './async-map';
+import { VNode, NodeContext } from '../types';
+
+import { asyncMap } from './utils/async-map';
 import { removeStranglers } from './remove-stranglers';
 import { patchProps } from './patch-props';
 import { render } from './render';
@@ -8,7 +10,7 @@ export async function renderChildren(
   previousChildren: VNode[] | VNode,
   container: HTMLElement,
   parentIndex: number,
-  context: Context
+  context: NodeContext
 ): Promise<VNode[]> {
   let offset = parentIndex;
   const renderedData = await asyncMap(currentChildren, async (child, index) => {

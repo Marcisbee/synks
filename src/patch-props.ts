@@ -1,3 +1,4 @@
+import { VNode } from '../types';
 
 export function patchProps(currentNode: VNode, previousNode: VNode): void {
   const target = currentNode.target;

@@ -1,3 +1,4 @@
+import { VNode } from '../types';
 
 export function removeNode(node: VNode | VNode[]): void {
   if (node instanceof Array) {

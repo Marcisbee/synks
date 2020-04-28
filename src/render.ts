@@ -1,21 +1,19 @@
-import { renderChildren } from "./render-children";
-import { patchProps } from "./patch-props";
-import { build } from "./build";
-import { removeStranglers } from "./remove-stranglers";
-import { removeNode } from "./remove-node";
-import { quickEqual } from "./quick-equal";
+import { VNode, NodeContext, Scope } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const GeneratorFunction = (function* () { }).constructor;
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const AsyncGeneratorFunction = (async function* () { }).constructor;
+import { renderChildren } from './render-children';
+import { patchProps } from './patch-props';
+import { build } from './build';
+import { removeStranglers } from './remove-stranglers';
+import { removeNode } from './remove-node';
+import { quickEqual } from './utils/quick-equal';
+import { AsyncGeneratorFunction, GeneratorFunction } from './utils/generators';
 
 export async function render(
   currentNode: VNode | VNode[],
   previousNode: VNode = currentNode.constructor(),
   container: HTMLElement,
   childIndex: number,
-  context: Context
+  context: NodeContext
 ): Promise<VNode | VNode[]> {
   if (currentNode instanceof Array) {
     return await renderChildren(currentNode, previousNode, container, childIndex, context);
@@ -131,7 +129,7 @@ export async function render(
       }
 
       if (fn instanceof AsyncGeneratorFunction) {
-        scope.nextProps(output.instance);
+        scope.next();
       }
 
       const rendered = await render(output, previousTree as any, container, childIndex, newContext);
@@ -143,7 +141,7 @@ export async function render(
           placeholder = null;
         }
 
-        if (previousNode.instance && output.target !== previousNode.instance.target) {
+        if (previousNode.instance && !(output instanceof Array) && !(previousNode.instance instanceof Array) && output.target !== previousNode.instance.target) {
           placeholder = previousNode.instance;
         }
       }

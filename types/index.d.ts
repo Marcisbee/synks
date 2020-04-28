@@ -1,5 +1,4 @@
-interface Scope {
-  name: string;
+export interface Scope {
   _c: Scope[];
   mounted: boolean;
   rendering: boolean;
@@ -10,7 +9,7 @@ interface Scope {
   [key: string]: any;
 }
 
-type TargetElement = HTMLElement | SVGElement | Text;
+export type TargetElement = HTMLElement | SVGElement | Text;
 
 interface VNodeHelpers {
   target?: TargetElement;
@@ -18,13 +17,13 @@ interface VNodeHelpers {
   scope?: Scope;
 }
 
-interface VNode extends VNodeHelpers {
+export interface VNode extends VNodeHelpers {
   type: string | Function;
   props: null | Record<string, any>;
   children: VNode[];
   key?: string;
 }
 
-interface Context {
+export interface NodeContext {
   [key: string]: any;
 }

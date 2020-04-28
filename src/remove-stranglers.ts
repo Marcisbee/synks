@@ -1,3 +1,5 @@
+import { VNode } from '../types';
+
 import { removeNode } from './remove-node';
 
 export function removeStranglers(previous: VNode | VNode[]): void {

@@ -1,3 +1,5 @@
+import { VNode } from '../types';
+
 import { transformChildren } from './transform-children';
 
 export function h(type: string | Function, props: null | Record<string, any>, ...rawChildren: (VNode | string)[]): VNode {

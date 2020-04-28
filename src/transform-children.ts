@@ -1,3 +1,5 @@
+import { VNode } from '../types';
+
 export function transformChildren(children: (VNode | string)[]): VNode[] {
   return children.map((child) => {
     if (child instanceof Array) {

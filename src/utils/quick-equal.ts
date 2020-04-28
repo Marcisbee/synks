@@ -1,4 +1,3 @@
-
 export function quickEqual(a: Record<string, any>, b: Record<string, any>): boolean {
   if (a === b) return true;
   if (!(a instanceof Object && a)) return false;

@@ -1,3 +1,5 @@
+import { VNode, TargetElement } from '../types';
+
 export async function build(
   currentNode: VNode,
   previousNode: VNode,
