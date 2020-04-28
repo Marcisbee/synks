@@ -14,11 +14,15 @@ let updateQueue = [];
 
 export async function render(
   currentNode: VNode | VNode[],
-  previousNode: VNode = currentNode.constructor(),
+  previousNode: VNode = currentNode && currentNode.constructor(),
   container: HTMLElement,
   childIndex: number,
   context: NodeContext
 ): Promise<VNode | VNode[]> {
+  if (currentNode === undefined || currentNode === null) {
+    return previousNode;
+  }
+
   if (currentNode instanceof Array) {
     return await renderChildren(currentNode, previousNode, container, childIndex, context);
   }
@@ -157,24 +161,26 @@ export async function render(
 
         output = (await generator.next()).value;
 
-        let outputIsContext = Object.getPrototypeOf(output) === Context;
-        if (outputIsContext) {
-          do {
-            const contextName = output && (output as unknown as Function).name;
-            const currentContext = context[contextName];
+        if (output) {
+          let outputIsContext = Object.getPrototypeOf(output) === Context;
+          if (outputIsContext) {
+            do {
+              const contextName = output && (output as unknown as Function).name;
+              const currentContext = context[contextName];
 
-            if (!currentContext) {
-              throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
-            }
+              if (!currentContext) {
+                throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
+              }
 
-            if (currentContext[1].indexOf(scope) === -1) {
-              currentContext[1].push(scope);
-            }
+              if (currentContext[1].indexOf(scope) === -1) {
+                currentContext[1].push(scope);
+              }
 
-            output = (await generator.next(currentContext[0])).value;
+              output = (await generator.next(currentContext[0])).value;
 
-            outputIsContext = Object.getPrototypeOf(output) === Context;
-          } while (outputIsContext);
+              outputIsContext = Object.getPrototypeOf(output) === Context;
+            } while (outputIsContext);
+          }
         }
       } else {
         output = await fn.call(scope, props);
