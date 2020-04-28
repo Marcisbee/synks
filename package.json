@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node config/fuse",
     "build": "rollup -c config/rollup.config.js",
+    "test": "jest src",
     "lint": "eslint . --ext .ts"
   },
   "repository": {
@@ -23,13 +24,16 @@
   },
   "homepage": "https://github.com/Marcisbee/synks#readme",
   "devDependencies": {
+    "@types/jest": "^25.2.1",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "eslint": "^6.8.0",
-    "fuse-box": "^4.0.0-next.426",
+    "fuse-box": "^4.0.0-next.427",
+    "jest": "^25.4.0",
     "rollup": "^1.31.1",
     "rollup-plugin-terser": "^5.3.0",
-    "rollup-plugin-typescript2": "^0.27.0"
+    "rollup-plugin-typescript2": "^0.27.0",
+    "sucrase": "^3.13.0"
   },
   "files": [
     "dist",
@@ -58,5 +62,10 @@
     ".cache",
     "examples",
     "*.js"
-  ]
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.(t|j)s?$": "<rootDir>/config/jest-preprocessor.js"
+    }
+  }
 }
