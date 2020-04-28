@@ -8,7 +8,7 @@ class Context {
       target: 'browser',
       devServer: true,
       webIndex: {
-        template: '../public/index.html',
+        template: '../examples/public/index.html',
       },
       compilerOptions: {
         jsxFactory: 'Synks.h',

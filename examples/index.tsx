@@ -193,12 +193,12 @@ function number2words(n) {
 //   }
 // }
 
-// class CountContext extends Synks.Context {
-//   count = 0;
-//   increment() {
-//     return this.count += 1;
-//   }
-// }
+class CountContext extends Synks.Context {
+  count = 0;
+  increment() {
+    return this.count += 1;
+  }
+}
 
 // function* Comp() {
 //   const [countContext, next] = yield CountContext;
@@ -250,7 +250,6 @@ function* CountButton() {
     );
   }
 }
-
 
 // class CountContext2 extends Synks.Context {
 //   count = 0;
@@ -323,13 +322,43 @@ function* Test() {
   )
 }
 
+function* Child(props) {
+  const [countContext, set] = yield CountContext;
+
+  while (true) {
+    yield <h4 onclick={() => {
+      set({ count: countContext.count + 1 })
+    }}>{props.prop} | {countContext.count} Hello there : {Math.random()}</h4>
+  }
+}
+
+function* ContextApp() {
+  while (true) {
+    yield (
+      <div>
+        {/* <Child/> */}
+        <strong>{Math.random()}</strong>
+        <CountContext>
+          <Child prop={Math.random()} />
+          <br/>
+          {Math.random()}
+          <Child />
+          asd
+        </CountContext>
+        <button onclick={() => this.next()}>update</button>
+      </div>
+    );
+  }
+}
+
 (async () => {
   // For HMR
   console.clear();
   document.body.innerHTML = 'Rendering started..<br/><br/><div id="root"></div>';
 
   // await Synks.mount(<ErrorBoundary><Sample1 /></ErrorBoundary>, document.getElementById('root'));
-  await Synks.mount(<App />, document.getElementById('root'));
+  // await Synks.mount(<App />, document.getElementById('root'));
+  await Synks.mount(<ContextApp />, document.getElementById('root'));
   // await Synks.mount(<Test />, document.getElementById('root'));
   // await Synks.mount(<div>
   //   <CountContext2>

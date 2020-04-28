@@ -1,20 +1,22 @@
 import { VNode, VNodeProps, TargetElement } from '../types';
 
+function getChildNodes(node: Node): ChildNode[] {
+  return Array.prototype.slice.call(node.childNodes);
+}
+
 export async function build(
   currentNode: VNode,
-  previousNode: VNode,
+  previousNode: VNode = {} as any,
   container: Node,
 ): Promise<TargetElement> {
-  const underSameParent = !!Array.prototype.slice.call(container.childNodes).find(t => t === previousNode.target);
-
-  if (!underSameParent) {
-    previousNode.props = {};
-    previousNode.key = null;
-  }
-
   if (currentNode.target) {
     return currentNode.target;
   }
+
+  const underSameParent = container
+    ? !!getChildNodes(container)
+      .find((child) => child === previousNode.target)
+    : false;
 
   // Text node
   if (currentNode.type === '') {
@@ -24,8 +26,7 @@ export async function build(
     }
 
     // Patch text node
-    if (underSameParent && previousNode && previousNode.type === '' && previousNode.target
-      && previousNode.target.parentNode === container) {
+    if (underSameParent && previousNode && previousNode.type === '' && previousNode.target) {
       // Patch node content
       if (currentNode.props !== previousNode.props) {
         previousNode.target.nodeValue = String(currentNode.props);
@@ -36,6 +37,11 @@ export async function build(
 
     // New text node
     return new Text(String(currentNode.props));
+  }
+
+  if (!underSameParent) {
+    previousNode.props = {};
+    previousNode.key = null;
   }
 
   // Patch node

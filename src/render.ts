@@ -6,7 +6,11 @@ import { build } from './build';
 import { removeStranglers } from './remove-stranglers';
 import { removeNode } from './remove-node';
 import { quickEqual } from './utils/quick-equal';
+import { Context } from './Context';
+import { arrayUnique } from './utils/array-unique';
 import { AsyncGeneratorFunction, GeneratorFunction } from './utils/generators';
+
+let updateQueue = [];
 
 export async function render(
   currentNode: VNode | VNode[],
@@ -21,6 +25,34 @@ export async function render(
 
   // Component
   if (currentNode.type instanceof Function) {
+    const isContext = Object.getPrototypeOf(currentNode.type) === Context;
+
+    // Context
+    if (isContext) {
+      const currentContext = new (currentNode.type as any)(currentNode.props);
+      const name = currentNode.type.name;
+      const events = [];
+
+      const nextFn = async (newContext: Record<string, any>): Promise<void> => {
+        updateQueue = arrayUnique(events.concat(updateQueue));
+        Object.assign(currentContext, newContext);
+
+        const cache = updateQueue.slice();
+        updateQueue = [];
+        cache.forEach((event) => {
+          event.next();
+        });
+      };
+      currentContext.__update = async (): Promise<any> => await nextFn.call(currentContext);
+      const ctx = [currentContext, nextFn];
+
+      // Render children
+      return await render(currentNode.children, previousNode.children as any, container, childIndex, {
+        ...context,
+        [name]: [ctx, events],
+      });
+    }
+
     if (currentNode.type === previousNode.type && !!previousNode.instance) {
       const props = Object.assign({}, currentNode.props, {
         children: currentNode.children,
@@ -35,7 +67,7 @@ export async function render(
 
       const output = Object.assign(currentNode, previousNode);
 
-      if (key1 === key2 || quickEqual(props, props2)) {
+      if (quickEqual(props, props2) || (key1 !== null && key1 === key2)) {
         return output;
       }
 
@@ -124,6 +156,26 @@ export async function render(
         }
 
         output = (await generator.next()).value;
+
+        let outputIsContext = Object.getPrototypeOf(output) === Context;
+        if (outputIsContext) {
+          do {
+            const contextName = output && (output as unknown as Function).name;
+            const currentContext = context[contextName];
+
+            if (!currentContext) {
+              throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
+            }
+
+            if (currentContext[1].indexOf(scope) === -1) {
+              currentContext[1].push(scope);
+            }
+
+            output = (await generator.next(currentContext[0])).value;
+
+            outputIsContext = Object.getPrototypeOf(output) === Context;
+          } while (outputIsContext);
+        }
       } else {
         output = await fn.call(scope, props);
       }
