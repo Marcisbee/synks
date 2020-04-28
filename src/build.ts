@@ -1,4 +1,4 @@
-import { VNode, TargetElement } from '../types';
+import { VNode, VNodeProps, TargetElement } from '../types';
 
 export async function build(
   currentNode: VNode,
@@ -20,7 +20,7 @@ export async function build(
   if (currentNode.type === '') {
     const p = currentNode.props;
     if (p === undefined || p === null || typeof p === 'boolean') {
-      currentNode.props = '' as any;
+      currentNode.props = '' as unknown as VNodeProps;
     }
 
     // Patch text node

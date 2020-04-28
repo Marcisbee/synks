@@ -15,7 +15,7 @@ export function patchProps(currentNode: VNode, previousNode: VNode): void {
       if (value === null || value === false || value === undefined) {
         return target.removeAttribute(name);
       }
-      return target.setAttribute(name, value);
+      return target.setAttribute(name, String(value));
     }
   });
 

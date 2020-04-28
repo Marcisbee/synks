@@ -3,10 +3,10 @@ export interface Scope {
   mounted: boolean;
   rendering: boolean;
   next: () => Promise<void>;
-  nextProps: (props: null | Record<string, any>) => Promise<void>;
+  nextProps: (props: VNodeProps) => Promise<void>;
   destroy: () => Promise<void>;
 
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type TargetElement = HTMLElement | SVGElement | Text;
@@ -17,13 +17,20 @@ interface VNodeHelpers {
   scope?: Scope;
 }
 
+export type VNodeProps = {
+  key?: string;
+
+  [key: string]: unknown;
+} | null;
+
 export interface VNode extends VNodeHelpers {
   type: string | Function;
-  props: null | Record<string, any>;
+  props: VNodeProps;
   children: VNode[];
   key?: string;
 }
 
 export interface NodeContext {
-  [key: string]: any;
+  scope?: Scope;
+  [key: string]: unknown;
 }

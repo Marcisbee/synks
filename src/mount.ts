@@ -11,5 +11,5 @@ export async function mount(
     node = [node];
   }
 
-  return await render(node, previousNode as any, container, 0, {});
+  return await render(node, previousNode as VNode, container, 0, {});
 }

@@ -1,4 +1,4 @@
-import { VNode, NodeContext, Scope } from '../types';
+import { VNode, NodeContext, Scope, VNodeProps } from '../types';
 
 import { renderChildren } from './render-children';
 import { patchProps } from './patch-props';
@@ -78,7 +78,7 @@ export async function render(
 
         scope.rendering = false;
       },
-      async *[(Symbol as any).asyncIterator]() {
+      async *[Symbol.asyncIterator]() {
 
         yield originalProps;
       },
@@ -114,7 +114,7 @@ export async function render(
     let generator = null;
     let placeholder = null;
     // eslint-disable-next-line no-inner-declarations
-    async function renderSelf(previousTree: VNode | VNode[], props: null | Record<string, any> = originalProps): Promise<VNode | VNode[]> {
+    async function renderSelf(previousTree: VNode | VNode[], props: VNodeProps = originalProps): Promise<VNode | VNode[]> {
       Object.assign(originalProps, props);
 
       // Generator component
@@ -132,8 +132,10 @@ export async function render(
         scope.next();
       }
 
-      const rendered = await render(output, previousTree as any, container, childIndex, newContext);
-      (currentNode as any).instance = output;
+      const rendered = await render(output, previousTree as VNode, container, childIndex, newContext);
+      if (!(currentNode instanceof Array)) {
+        currentNode.instance = output;
+      }
 
       if (fn instanceof AsyncGeneratorFunction) {
         if (placeholder) {
