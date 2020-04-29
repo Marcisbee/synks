@@ -1,10 +1,12 @@
 export interface Scope {
   _c: Scope[];
   mounted: boolean;
-  rendering: boolean;
   next: () => Promise<void>;
   nextProps: (props: VNodeProps) => Promise<void>;
   destroy: () => Promise<void>;
+
+  onMount: () => Promise<void>;
+  onDestroy: () => Promise<void>;
 
   [key: string]: unknown;
 }

@@ -8,7 +8,6 @@ import { removeNode } from './remove-node';
 import { quickEqual } from './utils/quick-equal';
 import { Context } from './Context';
 import { arrayUnique } from './utils/array-unique';
-import { isGeneratorFunction, isAsyncGeneratorFunction } from './utils/generators';
 import { transformNode } from './transform-node';
 
 let updateQueue = [];
@@ -25,7 +24,8 @@ export async function render(
   }
 
   if (currentNode instanceof Array) {
-    return await renderChildren(currentNode.map(transformNode), previousNode, container, childIndex, context);
+    const prevNodes = previousNode instanceof Array ? previousNode : [previousNode];
+    return await renderChildren(currentNode.map(transformNode), prevNodes, container, childIndex, context);
   }
 
   currentNode = transformNode(currentNode);
@@ -95,31 +95,29 @@ export async function render(
       children: currentNode.children,
     });
 
+    let isRendering = false;
     const scope: Scope = {
       mounted: true,
-      rendering: false,
       _c: [],
+      async onMount() { },
+      async onDestroy() { },
       async next() {
-        if (!scope.mounted || scope.rendering) {
+        if (!scope.mounted || isRendering) {
           return;
         }
 
         await this.nextProps(originalProps);
       },
       async nextProps(props) {
-        if (!scope.mounted || scope.rendering) {
+        if (!scope.mounted || isRendering) {
           return;
         }
-        scope.rendering = true;
+        isRendering = true;
 
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         await renderSelf(previousNode.instance, props);
 
-        scope.rendering = false;
-      },
-      async *[Symbol.asyncIterator]() {
-
-        yield originalProps;
+        isRendering = false;
       },
       async destroy() {
         if (!scope.mounted) {
@@ -127,6 +125,8 @@ export async function render(
         }
 
         scope.mounted = false;
+
+        await scope.onDestroy();
 
         scope._c.forEach((s) => {
           s.destroy();
@@ -151,66 +151,50 @@ export async function render(
     currentNode.scope = scope;
 
     let generator = null;
-    let placeholder = null;
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     // eslint-disable-next-line no-inner-declarations
     async function renderSelf(previousTree: VNode | VNode[], props: VNodeProps = originalProps): Promise<VNode | VNode[]> {
       Object.assign(originalProps, props);
 
-      // Generator component
-      if ((isGeneratorFunction(fn) || isAsyncGeneratorFunction(fn)) && typeof fn === 'function') {
-        if (!generator) {
-          generator = await fn.call(scope, props);
-        }
+      if (typeof fn === 'function') {
+        output = await fn.call(scope, props);
 
-        output = (await generator.next()).value;
+        // Generator component
+        if (output && typeof (output as any).next === 'function') {
+          if (!generator) {
+            generator = output;
+          }
 
-        if (output) {
-          let outputIsContext = Object.getPrototypeOf(output) === Context;
-          if (outputIsContext) {
-            do {
-              const contextName = output && (output as unknown as Function).name;
-              const currentContext = context[contextName];
+          output = (await generator.next()).value;
 
-              if (!currentContext) {
-                throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
-              }
+          if (output) {
+            let outputIsContext = Object.getPrototypeOf(output) === Context;
+            if (outputIsContext) {
+              do {
+                const contextName = output && (output as unknown as Function).name;
+                const currentContext = context[contextName];
 
-              if (currentContext[1].indexOf(scope) === -1) {
-                currentContext[1].push(scope);
-              }
+                if (!currentContext) {
+                  throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
+                }
 
-              output = (await generator.next(currentContext[0])).value;
+                if (currentContext[1].indexOf(scope) === -1) {
+                  currentContext[1].push(scope);
+                }
 
-              outputIsContext = Object.getPrototypeOf(output) === Context;
-            } while (outputIsContext);
+                output = (await generator.next(currentContext[0])).value;
+
+                outputIsContext = Object.getPrototypeOf(output) === Context;
+              } while (outputIsContext);
+            }
           }
         }
-      } else {
-        output = await fn.call(scope, props);
-      }
-
-      const isAsyncGenerator = isAsyncGeneratorFunction(fn);
-
-      if (isAsyncGenerator) {
-        scope.next();
       }
 
       const rendered = await render(output, previousTree as VNode, container, childIndex, newContext);
       if (!(currentNode instanceof Array)) {
         currentNode.instance = output;
-      }
-
-      if (isAsyncGenerator) {
-        if (placeholder) {
-          removeNode(placeholder);
-          placeholder = null;
-        }
-
-        if (previousNode.instance && !(output instanceof Array) && !(previousNode.instance instanceof Array) && output.target !== previousNode.instance.target) {
-          placeholder = previousNode.instance;
-        }
       }
 
       Object.assign(previousNode, currentNode);
@@ -224,6 +208,8 @@ export async function render(
     }
 
     await renderSelf(previousNode);
+
+    scope.onMount();
 
     return currentNode;
   }

@@ -1,6 +1,6 @@
 {
   "name": "synks",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Asynchronous view renderer",
   "main": "dist/synks.js",
   "types": "dist/index.d.ts",
@@ -53,6 +53,7 @@
     "rules": {
       "@typescript-eslint/prefer-namespace-keyword": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-namespace": "off"
     }
   },

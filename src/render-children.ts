@@ -26,7 +26,7 @@ export async function renderChildren(
     }
 
     // Handle keyed children
-    if (child.key !== null && child.key !== undefined && previousNode && previousChildren instanceof Array) {
+    if (child && child.key !== null && child.key !== undefined && previousNode && previousChildren instanceof Array) {
       if (previousNode.key === child.key) {
         child.target = previousNode.target;
         previousNode.target = null;
