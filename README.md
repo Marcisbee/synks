@@ -5,6 +5,11 @@
 It uses JSX/hyperscript for it's templating.
 Functions, promises and generators for component composition. And classes for contexts.
 
+[![npm version](https://img.shields.io/npm/v/synks.svg?style=flat-square)](https://www.npmjs.com/package/synks)
+[![npm downloads](https://img.shields.io/npm/dm/synks.svg?style=flat-square)](https://www.npmjs.com/package/synks)
+[![npm bundle size (version)](https://img.shields.io/bundlephobia/minzip/synks/latest?style=flat-square)](https://bundlephobia.com/result?p=synks)
+<!--![Gitlab pipeline status (branch)](https://img.shields.io/gitlab/pipeline/Marcisbee/synks/master?style=flat-square)-->
+
 ## Installation
 
 > **NOTE:** This is proof of concept. Altho it's working as intended it might not be ready for production use!
@@ -15,7 +20,7 @@ To install the stable version:
 npm install --save synks
 ```
 
-This assumes you are using [npm](https://www.npmjs.com/synks) as your package manager.
+This assumes you are using [npm](https://www.npmjs.com/package/synks) as your package manager.
 
 If you're not, you can [access these files on unpkg](https://unpkg.com/synks/dist/), download them, or point your package manager to them.
 
