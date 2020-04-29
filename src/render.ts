@@ -9,6 +9,7 @@ import { quickEqual } from './utils/quick-equal';
 import { Context } from './Context';
 import { arrayUnique } from './utils/array-unique';
 import { AsyncGeneratorFunction, GeneratorFunction } from './utils/generators';
+import { transformNode } from './transform-node';
 
 let updateQueue = [];
 
@@ -20,12 +21,14 @@ export async function render(
   context: NodeContext
 ): Promise<VNode | VNode[]> {
   if (currentNode === undefined || currentNode === null) {
-    return previousNode;
+    return transformNode(currentNode as null);
   }
 
   if (currentNode instanceof Array) {
-    return await renderChildren(currentNode, previousNode, container, childIndex, context);
+    return await renderChildren(currentNode.map(transformNode), previousNode, container, childIndex, context);
   }
+
+  currentNode = transformNode(currentNode);
 
   // Component
   if (currentNode.type instanceof Function) {
@@ -252,7 +255,9 @@ export async function render(
   }
 
   // Patch children
-  await renderChildren(currentNode.children, previousNode.children, currentNode.target as HTMLElement, 0, context);
+  if (currentNode.children instanceof Array) {
+    await renderChildren(currentNode.children, previousNode.children, currentNode.target as HTMLElement, 0, context);
+  }
 
   // Remove stranglers
   if (previousNode.target && previousNode.target.parentNode && previousNode.target !== currentNode.target && previousNode.target !== container) {

@@ -1,11 +1,4 @@
 import { h } from './h';
-import { transformChildren } from './transform-children';
-
-beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  transformChildren = jest.fn(() => 'TRANSFORMED CHILDREN');
-});
 
 test('creates simple "div" node', () => {
   const type = 'div';
@@ -14,7 +7,6 @@ test('creates simple "div" node', () => {
 
   const output = h(type, props, ...children);
 
-  expect(transformChildren).toBeCalledTimes(0);
   expect(output).toEqual({
     type: 'div',
     props: {},
@@ -26,19 +18,17 @@ test('creates simple "div" node', () => {
 test('creates "div" node with children', () => {
   const type = 'div';
   const props = {};
-  const children = [
+  const children: any = [
     '1'
   ];
 
   const output = h(type, props, ...children);
 
-  expect(transformChildren).toBeCalledTimes(1);
-  expect(transformChildren).toBeCalledWith(['1']);
   expect(output).toEqual({
     type: 'div',
     props: {},
     key: null,
-    children: 'TRANSFORMED CHILDREN',
+    children: ['1'],
   });
 });
 
@@ -47,21 +37,19 @@ test('creates "div" node with key', () => {
   const props = {
     key: '2',
   };
-  const children = [
+  const children: any = [
     '1'
   ];
 
   const output = h(type, props, ...children);
 
-  expect(transformChildren).toBeCalledTimes(1);
-  expect(transformChildren).toBeCalledWith(['1']);
   expect(output).toEqual({
     type: 'div',
     props: {
       key: '2',
     },
     key: '2',
-    children: 'TRANSFORMED CHILDREN',
+    children: ['1'],
   });
 });
 
@@ -72,14 +60,12 @@ test('creates "div" node with multiple props', () => {
     a: 1,
     b: false,
   };
-  const children = [
+  const children: any = [
     '1'
   ];
 
   const output = h(type, props, ...children);
 
-  expect(transformChildren).toBeCalledTimes(1);
-  expect(transformChildren).toBeCalledWith(['1']);
   expect(output).toEqual({
     type: 'div',
     props: {
@@ -88,7 +74,7 @@ test('creates "div" node with multiple props', () => {
       b: false,
     },
     key: '2',
-    children: 'TRANSFORMED CHILDREN',
+    children: ['1'],
   });
 });
 
@@ -98,7 +84,6 @@ test('creates simple text node', () => {
 
   const output = h(type, props);
 
-  expect(transformChildren).toBeCalledTimes(0);
   expect(output).toEqual({
     type: '',
     props: 'Hello world',

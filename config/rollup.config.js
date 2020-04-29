@@ -11,18 +11,15 @@ export default [
     output: [
       {
         file: pkg.main,
-        format: 'cjs'
+        format: 'cjs',
       },
-      {
-        file: pkg.module,
-        format: 'esm'
-      }
     ],
     plugins: [
       typescript({
         typescript: require('typescript'),
         tsconfigDefaults: {
           compilerOptions: {
+            target: 'ES5',
             declaration: true,
           },
           include: [
@@ -37,18 +34,67 @@ export default [
     output: [
       {
         file: `dist/${pkg.name}.min.js`,
-        format: 'cjs'
+        format: 'cjs',
       },
-      {
-        file: `dist/${pkg.name}.es.min.js`,
-        format: 'esm'
-      }
     ],
     plugins: [
       typescript({
         typescript: require('typescript'),
+        tsconfigDefaults: {
+          target: 'ES5',
+          include: [
+            'src'
+          ]
+        },
       }),
-      terser(),
+      terser({
+        module: true,
+      }),
+    ],
+  },
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: pkg.module,
+        format: 'esm',
+      },
+    ],
+    plugins: [
+      typescript({
+        typescript: require('typescript'),
+        tsconfigDefaults: {
+          compilerOptions: {
+            target: 'ESNEXT',
+          },
+          include: [
+            'src'
+          ]
+        },
+      }),
+    ],
+  },
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        file: `dist/${pkg.name}.es.min.js`,
+        format: 'esm'
+      },
+    ],
+    plugins: [
+      typescript({
+        typescript: require('typescript'),
+        tsconfigDefaults: {
+          target: 'ESNEXT',
+          include: [
+            'src'
+          ]
+        },
+      }),
+      terser({
+        module: true,
+      }),
     ],
   },
 ];

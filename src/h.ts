@@ -1,9 +1,6 @@
 import { VNode, VNodeProps } from '../types';
 
-import { transformChildren } from './transform-children';
-
-export function h(type: string | Function, props: VNodeProps, ...rawChildren: (VNode | string)[]): VNode {
-  const children = rawChildren.length > 0 ? transformChildren(rawChildren) : [];
+export function h(type: string | Function, props: VNodeProps, ...children: VNode[]): VNode {
   const key = props && props.key
 
   return {

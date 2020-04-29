@@ -7,6 +7,10 @@ export async function mount(
   container: HTMLElement = document.body,
   previousNode: VNode | VNode[] = node.constructor()
 ): Promise<VNode | VNode[]> {
+  if (!(container instanceof HTMLElement)) {
+    throw new Error('[Synks] Container should be valid HTMLElement');
+  }
+
   if (!(node instanceof Array)) {
     node = [node];
   }
