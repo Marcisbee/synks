@@ -1,5 +1,11 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+export function isGeneratorFunction(fn: any): boolean {
+  return typeof fn === 'function' &&
+    fn.constructor &&
+    fn.constructor.name === 'GeneratorFunction'
+}
 
-export const GeneratorFunction = (function* () {}).constructor;
-export const AsyncGeneratorFunction = (async function* () {}).constructor;
+export function isAsyncGeneratorFunction(fn: any): boolean {
+  return typeof fn === 'function' &&
+    fn.constructor &&
+    fn.constructor.name === 'AsyncGeneratorFunction'
+}

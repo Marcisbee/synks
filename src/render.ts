@@ -8,7 +8,7 @@ import { removeNode } from './remove-node';
 import { quickEqual } from './utils/quick-equal';
 import { Context } from './Context';
 import { arrayUnique } from './utils/array-unique';
-import { AsyncGeneratorFunction, GeneratorFunction } from './utils/generators';
+import { isGeneratorFunction, isAsyncGeneratorFunction } from './utils/generators';
 import { transformNode } from './transform-node';
 
 let updateQueue = [];
@@ -159,7 +159,7 @@ export async function render(
       Object.assign(originalProps, props);
 
       // Generator component
-      if ((fn instanceof AsyncGeneratorFunction || fn instanceof GeneratorFunction) && typeof fn === 'function') {
+      if ((isGeneratorFunction(fn) || isAsyncGeneratorFunction(fn)) && typeof fn === 'function') {
         if (!generator) {
           generator = await fn.call(scope, props);
         }
@@ -191,7 +191,9 @@ export async function render(
         output = await fn.call(scope, props);
       }
 
-      if (fn instanceof AsyncGeneratorFunction) {
+      const isAsyncGenerator = isAsyncGeneratorFunction(fn);
+
+      if (isAsyncGenerator) {
         scope.next();
       }
 
@@ -200,7 +202,7 @@ export async function render(
         currentNode.instance = output;
       }
 
-      if (fn instanceof AsyncGeneratorFunction) {
+      if (isAsyncGenerator) {
         if (placeholder) {
           removeNode(placeholder);
           placeholder = null;

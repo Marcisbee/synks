@@ -1,43 +1,43 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { AsyncGeneratorFunction, GeneratorFunction } from './generators';
+import { isAsyncGeneratorFunction, isGeneratorFunction } from './generators';
 
-describe('GeneratorFunction', () => {
+describe('isGeneratorFunction', () => {
   test('generator should be instance', () => {
     function* Sample() { }
 
-    expect(Sample instanceof GeneratorFunction).toBe(true);
+    expect(isGeneratorFunction(Sample)).toBe(true);
   });
 
   test('simple function should not be this instance', () => {
     function Sample() { }
 
-    expect(Sample instanceof GeneratorFunction).toBe(false);
+    expect(isGeneratorFunction(Sample)).toBe(false);
   });
 
   test('async generator should not be instance', () => {
     async function* Sample() { }
 
-    expect(Sample instanceof GeneratorFunction).toBe(false);
+    expect(isGeneratorFunction(Sample)).toBe(false);
   });
 })
 
-describe('AsyncGeneratorFunction', () => {
+describe('isAsyncGeneratorFunction', () => {
   test('async generator should be instance', () => {
     async function* Sample() { }
 
-    expect(Sample instanceof AsyncGeneratorFunction).toBe(true);
+    expect(isAsyncGeneratorFunction(Sample)).toBe(true);
   });
 
   test('generator should not be instance', () => {
     function* Sample() { }
 
-    expect(Sample instanceof AsyncGeneratorFunction).toBe(false);
+    expect(isAsyncGeneratorFunction(Sample)).toBe(false);
   });
 
   test('simple function should not be instance', () => {
     function Sample() { }
 
-    expect(Sample instanceof AsyncGeneratorFunction).toBe(false);
+    expect(isAsyncGeneratorFunction(Sample)).toBe(false);
   });
 })
