@@ -149,6 +149,8 @@ export async function render(
 
     let generator = null;
     let placeholder = null;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     // eslint-disable-next-line no-inner-declarations
     async function renderSelf(previousTree: VNode | VNode[], props: VNodeProps = originalProps): Promise<VNode | VNode[]> {
       Object.assign(originalProps, props);

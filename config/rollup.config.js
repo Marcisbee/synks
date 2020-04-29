@@ -15,7 +15,7 @@ export default [
       },
       {
         file: pkg.module,
-        format: 'es'
+        format: 'esm'
       }
     ],
     plugins: [
@@ -41,7 +41,7 @@ export default [
       },
       {
         file: `dist/${pkg.name}.es.min.js`,
-        format: 'es'
+        format: 'esm'
       }
     ],
     plugins: [
