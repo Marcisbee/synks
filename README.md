@@ -92,7 +92,10 @@ function Loading() {
 }
 
 async function *Suspense({ fallback, children }) {
-  for await ({ fallback, children } of this) {
+  // Here we are saying when fallback is mounted, go to next yield.
+  this.onMount = this.next;
+
+  while (true) {
     yield fallback;
     yield (
       <div>{children}</div>
@@ -157,6 +160,8 @@ Ok so when you `yield` a context it automatically spits out corresponding contex
 It works just like `useState` where `next({ count: 10 })` will update context state. And trigger update for all components using it.
 
 _NOTE_: Do not destruct `countContext` as it will be transformed to simple value and not be updateable.
+
+Here's a more in depth example of Contexts: [codesandbox.io/s/synks-30bze](https://codesandbox.io/s/synks-30bze?file=/src/index.tsx)
 
 ## Architecture
 
