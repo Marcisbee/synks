@@ -1,3 +1,18 @@
+function checkEquality(a: Record<string, unknown>, b: Record<string, unknown>, keys: string[]): boolean {
+  for (const key of keys) {
+    if (typeof a[key] === 'function' && String(a[key]) !== String(b[key])) {
+      return false;
+    }
+
+    if (JSON.stringify(a[key]) !== JSON.stringify(b[key]) && a[key] !== b[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 export function quickEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
   if (a === b) return true;
   if (!(a instanceof Object && a)) return false;
@@ -8,5 +23,5 @@ export function quickEqual(a: Record<string, unknown>, b: Record<string, unknown
 
   if (ai.length !== bi.length) return false;
 
-  return JSON.stringify(a, ai) === JSON.stringify(b, ai);
+  return checkEquality(a, b, ai);
 }

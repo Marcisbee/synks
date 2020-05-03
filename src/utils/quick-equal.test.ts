@@ -1,5 +1,7 @@
 import { quickEqual } from './quick-equal';
 
+function noop() { }
+
 test.each([
   [undefined, undefined],
   [null, null],
@@ -9,6 +11,8 @@ test.each([
   [{ a: 1 }, { a: 1 }],
   [{ a: 1, b: 2 }, { b: 2, a: 1 }],
   [{ a: 1, b: [1, 2, 3] }, { b: [1, 2, 3], a: 1 }],
+  [{ a: { b: { c: 3 }, d: true } }, { a: { b: { c: 3 }, d: true } }],
+  [{ a: noop }, { a: noop }],
 ])('returns `true` with input %s and %s', (a, b) => {
   expect(quickEqual(a as any, b as any)).toBe(true);
 });
@@ -21,6 +25,7 @@ test.each([
   [{ a: 1 }, { a: 2 }],
   [{ a: 1, b: 2 }, { b: 3, a: 1 }],
   [{ a: 1, b: [1, 2, 3] }, { b: [1, 3, 2], a: 1 }],
+  [{ a: noop }, { a() { } }],
 ])('returns `false` with input %s and %s', (a, b) => {
   expect(quickEqual(a as any, b as any)).toBe(false);
 });

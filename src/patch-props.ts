@@ -2,7 +2,7 @@ import { VNode } from '../types';
 
 export function patchProps(currentNode: VNode, previousNode: VNode): void {
   const target = currentNode.target;
-  if (!currentNode.type || (target instanceof Text)) return;
+  if (!currentNode.type || (target instanceof Text) || !target) return;
 
   Object.keys(currentNode.props || {}).forEach(name => {
     const value = currentNode.props[name];

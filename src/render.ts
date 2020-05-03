@@ -78,6 +78,8 @@ export async function render(
         return output;
       }
 
+      currentNode.props = props;
+
       await output.scope.nextProps(props);
 
       return output;
