@@ -30,6 +30,18 @@ export async function render(
 
   currentNode = transformNode(currentNode);
 
+  if (previousNode && previousNode.type instanceof Function && currentNode && currentNode.type !== previousNode.type) {
+    const cachedTarget = previousNode && Object.assign({}, previousNode.instance);
+
+    if (previousNode.scope) {
+      await previousNode.scope.destroy();
+    }
+
+    if (cachedTarget) {
+      removeNode(cachedTarget);
+    }
+  }
+
   // Component
   if (currentNode.type instanceof Function) {
     const isContext = Object.getPrototypeOf(currentNode.type) === Context;
@@ -44,20 +56,24 @@ export async function render(
         updateQueue = arrayUnique(events.concat(updateQueue));
         Object.assign(currentContext, newContext);
 
-        const cache = updateQueue.slice();
+        const cache = updateQueue.slice().filter((d) => d.mounted && !d.rendering);
         updateQueue = [];
-        cache.forEach((event) => {
-          event.next();
-        });
+
+        for (const event of cache) {
+          if (event.mounted && !event.rendering) {
+            await event.next();
+          }
+        }
       };
       currentContext.__update = async (): Promise<any> => await nextFn.call(currentContext);
       const ctx = [currentContext, nextFn];
 
+      context[name] = [ctx, events];
+
       // Render children
-      return await render(currentNode.children, previousNode.children as any, container, childIndex, {
-        ...context,
-        [name]: [ctx, events],
-      });
+      const output = await render(currentNode.children, previousNode.children as any, container, childIndex, context);
+
+      return output;
     }
 
     if (currentNode.type === previousNode.type && !!previousNode.instance) {
@@ -85,11 +101,6 @@ export async function render(
       return output;
     }
 
-    // Destroy previous component
-    if (previousNode.scope) {
-      await previousNode.scope.destroy();
-    }
-
     // Regular component
     let output: VNode | VNode[];
     const fn = currentNode.type;
@@ -97,29 +108,29 @@ export async function render(
       children: currentNode.children,
     });
 
-    let isRendering = false;
     const scope: Scope = {
       mounted: true,
+      rendering: false,
       _c: [],
       async onMount() { },
       async onDestroy() { },
       async next() {
-        if (!scope.mounted || isRendering) {
+        if (!scope.mounted || scope.rendering) {
           return;
         }
 
         await this.nextProps(originalProps);
       },
       async nextProps(props) {
-        if (!scope.mounted || isRendering) {
+        if (!scope.mounted || scope.rendering) {
           return;
         }
-        isRendering = true;
+        scope.rendering = true;
 
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        await renderSelf(previousNode.instance, props);
+        await renderSelf((currentNode as VNode).instance, props);
 
-        isRendering = false;
+        scope.rendering = false;
       },
       async destroy() {
         if (!scope.mounted) {
@@ -214,14 +225,6 @@ export async function render(
     scope.onMount();
 
     return currentNode;
-  }
-
-  if (previousNode.scope) {
-    await previousNode.scope.destroy();
-  }
-
-  if (previousNode.instance) {
-    removeNode(previousNode.instance);
   }
 
   const isKeyMoved = currentNode.target && previousNode.key !== undefined && previousNode.key !== null;

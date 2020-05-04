@@ -12,6 +12,8 @@ export function transformNode(node: VNode | string | null | undefined | number):
       key: node.key,
       children: node.children,
       target: null,
+      instance: null,
+      scope: null,
     });
   }
 

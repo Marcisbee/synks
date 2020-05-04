@@ -1,8 +1,15 @@
 import * as Synks from '../../src';
 import { RouterContext } from '../app';
 
+let count = 0;
+
 export function* Hello({ what }) {
   const [router] = yield RouterContext;
 
-  return <h1>Hello {what}</h1>;
+  while (true) {
+    yield <h1 onclick={() => {
+      count++;
+      this.next();
+    }}>Hello {what} - {count} - {router.route}</h1>;
+  }
 }

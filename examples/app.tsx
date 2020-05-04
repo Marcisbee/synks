@@ -52,6 +52,7 @@ export function* Router(props: { routes: Record<string, any> }) {
 const routes = {
   '/': () => <div>Examples</div>,
   '/hello': () => <Hello what="cool" />,
+  '/hello2': () => <Hello what="cool" />,
   '*': () => <div>Error 404</div>,
 };
 
@@ -64,6 +65,7 @@ function* Header() {
         <ul>
           <li onclick={() => router.navigate('/')}>Start</li>
           <li onclick={() => router.navigate('/hello')}>Hello</li>
+          <li onclick={() => router.navigate('/hello2')}>Hello2</li>
         </ul>
       </div>
     );

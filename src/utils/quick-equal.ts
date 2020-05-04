@@ -12,7 +12,6 @@ function checkEquality(a: Record<string, unknown>, b: Record<string, unknown>, k
   return true;
 }
 
-
 export function quickEqual(a: Record<string, unknown>, b: Record<string, unknown>): boolean {
   if (a === b) return true;
   if (!(a instanceof Object && a)) return false;
