@@ -209,6 +209,11 @@ function* countHook() {
     // Remove event listeners on cleanup
     window.removeEventListener('keydown', downHandler);
   }
+
+  while (true) {
+    // Return count value back to component
+    yield count;
+  }
 }
 ```
 
