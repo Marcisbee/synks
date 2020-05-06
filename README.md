@@ -233,6 +233,8 @@ function* Counter() {
 }
 ```
 
+This example available in [https://codesandbox.io/s/synks-hooks-9fehi](https://codesandbox.io/s/synks-hooks-9fehi?file=/src/app/app.tsx)
+
 This is it, now it's fully functional - locally scoped hook used in Counter component.
 
 Note that we use `count.value` instead of `count`, because this is what generator functions return. Also this helps to pass new value without calling `countHook` in while loop.
