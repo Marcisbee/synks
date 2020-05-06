@@ -9,6 +9,7 @@ import { quickEqual } from './utils/quick-equal';
 import { Context } from './Context';
 import { arrayUnique } from './utils/array-unique';
 import { transformNode } from './transform-node';
+import { handleCustomYields } from './yields';
 
 let updateQueue = [];
 
@@ -179,29 +180,13 @@ export async function render(
             generator = output;
           }
 
-          output = (await generator.next()).value;
-
-          if (output) {
-            let outputIsContext = Object.getPrototypeOf(output) === Context;
-            if (outputIsContext) {
-              do {
-                const contextName = output && (output as unknown as Function).name;
-                const currentContext = context[contextName];
-
-                if (!currentContext) {
-                  throw new Error(`${contextName} was called in <${((currentNode as VNode).type as Function).name}> before it was defined`);
-                }
-
-                if (currentContext[1].indexOf(scope) === -1) {
-                  currentContext[1].push(scope);
-                }
-
-                output = (await generator.next(currentContext[0])).value;
-
-                outputIsContext = Object.getPrototypeOf(output) === Context;
-              } while (outputIsContext);
-            }
-          }
+          output = await handleCustomYields(
+            generator,
+            output,
+            scope,
+            currentNode as VNode,
+            context
+          );
         }
       }
 

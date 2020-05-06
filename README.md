@@ -168,6 +168,90 @@ _NOTE_: Do not destruct `countContext` as it will be transformed to simple value
 
 Here's a more in depth example of Contexts: [codesandbox.io/s/synks-30bze](https://codesandbox.io/s/synks-30bze?file=/src/index.tsx)
 
+#### Code reuse (mixins vs hooks story)
+
+Let's take for example React hooks. You can create function and reuse that function in multiple components. Hooks can trigger updates, so basically it is extension of component.
+
+Ok, lets take a look at how mixins usually work. You create also some kind of a function and then this function or methods of this mixin gets used in component.
+
+So basically these are kind of 2 different solutions. I might have gone the route of either one of these, but instead I think I've found a solution for this that takes the best of both worlds.
+
+I currently call them hooks internally as they work more like hooks.
+
+It's just a generator function with ability to get parent components scope.
+
+Let's create our first hook, that will listen to keypressed events and increment value accordingly.
+
+```jsx
+function* countHook() {
+  /**
+   * First of all lets get scope of parent component.
+   * This will allow us to call `scope.next()` to update
+   * component, just like we do in components.
+   */
+  const scope = yield Synks.SCOPE;
+  let count = 0;
+
+  // If pressed key is our target key then set to true
+  const downHandler = ({ key }) => {
+    if (key === 'ArrowUp') {
+      // Increment count state
+      count++;
+      // And update component
+      scope.next();
+    }
+  }
+
+  // Add event listeners
+  window.addEventListener('keydown', downHandler);
+
+  scope.onDestroy = () => {
+    // Remove event listeners on cleanup
+    window.removeEventListener('keydown', downHandler);
+  }
+}
+```
+
+Ok this is how we create hook, but how do we use it?
+
+```jsx
+function* Counter() {
+  const count = yield countHook();
+
+  while (true) {
+    yield (
+      <h1>
+        {count.value}
+      </h1>
+    );
+  }
+}
+```
+
+This is it, now it's fully functional - locally scoped hook used in Counter component.
+
+Note that we use `count.value` instead of `count`, because this is what generator functions return. Also this helps to pass new value without calling `countHook` in while loop.
+
+But that is not all!
+
+Hooks can also use Context!
+
+```jsx
+function* countHook() {
+  const [countContext] = yield CountContext;
+
+  const downHandler = ({ key }) => {
+    if (key === 'ArrowUp') {
+      countContext.increment();
+      // We don't need to call `.next` here because
+      // context updates components itself
+    }
+  }
+
+  window.addEventListener('keydown', downHandler);
+}
+```
+
 ## Architecture
 
 Synks renders everything to DOM asyncronously. This means every exported method except `h` returns Promise. It waits for every component in it's child tree to be ready and only then it renders it.
