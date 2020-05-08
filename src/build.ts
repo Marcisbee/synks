@@ -6,7 +6,7 @@ function getChildNodes(node: Node): ChildNode[] {
 
 export async function build(
   currentNode: VNode,
-  previousNode: VNode = {} as any,
+  previousNode: VNode = {} as VNode,
   container: Node,
 ): Promise<TargetElement> {
   if (currentNode.target) {

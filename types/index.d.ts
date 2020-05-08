@@ -1,3 +1,9 @@
+export interface ContextInterface {
+  __update: () => void;
+}
+
+export type ContextFunction = new (...args: unknown[]) => ContextInterface;
+
 export interface Scope {
   _c: Scope[];
   mounted: boolean;
@@ -26,7 +32,7 @@ export type VNodeProps = {
 } | null;
 
 export interface VNode extends VNodeHelpers {
-  type: string | Function;
+  type: string | ContextFunction | ((...args: unknown[]) => VNode | VNode[]);
   props: VNodeProps;
   children: VNode[];
   key?: string;
@@ -35,4 +41,12 @@ export interface VNode extends VNodeHelpers {
 export interface NodeContext {
   scope?: Scope;
   [key: string]: unknown;
+}
+
+export interface Hook extends AsyncIterableIterator<any> {
+  next: (scope?: Scope) => Promise<IteratorResult<any, any>>;
+}
+
+export interface GeneratorRenderer extends AsyncIterableIterator<any> {
+  next: (value?: Scope | IteratorResult<any, any>) => Promise<IteratorResult<any, any>>;
 }

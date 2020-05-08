@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-export class Context {
+import { ContextInterface } from "../types/index.d";
+
+export class Context implements ContextInterface {
   constructor() {
     const keys = Object.getOwnPropertyNames(
       Object.getPrototypeOf(this)
@@ -22,5 +23,6 @@ export class Context {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   __update() { }
 }

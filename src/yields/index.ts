@@ -1,11 +1,10 @@
-import { VNode, Scope, NodeContext } from "../../types";
-import { Context } from "../Context";
+import { VNode, Scope, NodeContext, GeneratorRenderer, ContextFunction } from "../../types";
 import { isHook, handleHooks } from "./hook";
 import { isContext, handleContext } from "./context";
 
 export async function handleCustomYields(
-  generator: any,
-  output: VNode | VNode[] | Context | GeneratorFunction,
+  generator: GeneratorRenderer,
+  output: VNode | VNode[] | ContextFunction | GeneratorFunction,
   scope: Scope,
   node: VNode,
   context: NodeContext
@@ -17,5 +16,5 @@ export async function handleCustomYields(
     output = await handleContext(generator, scope, context, node, output);
   }
 
-  return output as unknown as VNode;
+  return output as VNode;
 }

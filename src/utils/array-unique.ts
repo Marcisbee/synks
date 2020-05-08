@@ -1,5 +1,5 @@
-export function arrayUnique(array: unknown[]): unknown[] {
-  const a = array.concat();
+export function arrayUnique<T>(array: T[]): T[] {
+  const a = array.slice();
   for (let i = 0; i < a.length; ++i) {
     for (let j = i + 1; j < a.length; ++j) {
       if (a[i] === a[j]) {

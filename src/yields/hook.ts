@@ -1,14 +1,15 @@
-import { Scope, NodeContext, VNode } from "../../types";
+import { Scope, NodeContext, VNode, Hook, GeneratorRenderer } from "../../types";
+import { isGenerator } from "../render";
 import { isContext } from "./context";
 
 export const SCOPE = Symbol("SCOPE");
 
-export function isHook(value: any): boolean {
-  return value && value.next instanceof Function && value.throw instanceof Function;
+export function isHook(value: any): value is Hook {
+  return isGenerator(value);
 }
 
 export async function handleHooks(
-  generator: any,
+  generator: GeneratorRenderer,
   scope: Scope,
   context: NodeContext,
   node: VNode | VNode[],
@@ -21,7 +22,7 @@ export async function handleHooks(
   while (isContext(value.value) || value.value === SCOPE) {
     // Allows context in hooks
     if (isContext(value.value)) {
-      const contextName = value.value && (value.value as unknown as Function).name;
+      const contextName = value.value && value.value.name;
       const currentContext = context[contextName];
 
       if (!currentContext) {

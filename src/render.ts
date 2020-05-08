@@ -1,4 +1,4 @@
-import { VNode, NodeContext, Scope, VNodeProps } from '../types';
+import { VNode, NodeContext, Scope, VNodeProps, GeneratorRenderer } from '../types';
 
 import { renderChildren } from './render-children';
 import { patchProps } from './patch-props';
@@ -6,12 +6,16 @@ import { build } from './build';
 import { removeStranglers } from './remove-stranglers';
 import { removeNode } from './remove-node';
 import { quickEqual } from './utils/quick-equal';
-import { Context } from './Context';
 import { arrayUnique } from './utils/array-unique';
 import { transformNode } from './transform-node';
 import { handleCustomYields } from './yields';
+import { isContext } from './yields/context';
 
 let updateQueue = [];
+
+export function isGenerator(value: any): value is GeneratorRenderer {
+  return value && typeof value.next === 'function' && typeof value.throw === 'function';
+}
 
 export async function render(
   currentNode: VNode | VNode[],
@@ -21,7 +25,7 @@ export async function render(
   context: NodeContext
 ): Promise<VNode | VNode[]> {
   if (currentNode === undefined || currentNode === null) {
-    return transformNode(currentNode as null);
+    return transformNode();
   }
 
   if (currentNode instanceof Array) {
@@ -45,12 +49,12 @@ export async function render(
 
   // Component
   if (currentNode.type instanceof Function) {
-    const isContext = Object.getPrototypeOf(currentNode.type) === Context;
+    const fn = currentNode.type;
 
     // Context
-    if (isContext) {
-      const currentContext = new (currentNode.type as any)(currentNode.props);
-      const name = currentNode.type.name;
+    if (isContext(fn)) {
+      const currentContext = new fn(currentNode.props);
+      const name = fn.name;
       const events = [];
 
       const nextFn = async (newContext: Record<string, any>): Promise<void> => {
@@ -104,7 +108,6 @@ export async function render(
 
     // Regular component
     let output: VNode | VNode[];
-    const fn = currentNode.type;
     const originalProps = Object.assign({}, currentNode.props, {
       children: currentNode.children,
     });
@@ -164,7 +167,7 @@ export async function render(
 
     currentNode.scope = scope;
 
-    let generator = null;
+    let generator: GeneratorRenderer;
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     // eslint-disable-next-line no-inner-declarations
@@ -175,7 +178,7 @@ export async function render(
         output = await fn.call(scope, props);
 
         // Generator component
-        if (output && typeof (output as any).next === 'function') {
+        if (isGenerator(output)) {
           if (!generator) {
             generator = output;
           }

@@ -1,12 +1,12 @@
-import { Scope, NodeContext, VNode } from "../../types";
+import { Scope, NodeContext, VNode, GeneratorRenderer, ContextFunction } from "../../types";
 import { Context } from "../Context";
 
-export function isContext(value: any): boolean {
+export function isContext(value: any): value is ContextFunction {
   return value && Object.getPrototypeOf(value) === Context;
 }
 
 export async function handleContext(
-  generator: any,
+  generator: GeneratorRenderer,
   scope: Scope,
   context: NodeContext,
   node: VNode | VNode[],
@@ -14,7 +14,7 @@ export async function handleContext(
 ): Promise<any> {
   if (!isContext(contextRoot)) return contextRoot;
 
-  const contextName = contextRoot && (contextRoot as unknown as Function).name;
+  const contextName = contextRoot && contextRoot.name;
   const currentContext = context[contextName];
 
   if (!currentContext) {
