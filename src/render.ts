@@ -11,6 +11,7 @@ import { removeNode } from './remove-node';
 import { removeStranglers } from './remove-stranglers';
 import { renderChildren } from './render-children';
 import { transformNode } from './transform-node';
+import { UPDATE_CONTEXT } from './symbols';
 
 let updateQueue = [];
 
@@ -67,10 +68,8 @@ export async function render(
           }
         }
       };
-      currentContext.__update = async (): Promise<any> => await nextFn.call(currentContext);
-      const ctx = [currentContext, nextFn];
-
-      context[name] = [ctx, events];
+      currentContext[UPDATE_CONTEXT] = async (): Promise<any> => await nextFn.call(currentContext);
+      context[name] = [currentContext, events];
 
       // Render children
       const output = await render(currentNode.children, previousNode.children as any, container, childIndex, context);

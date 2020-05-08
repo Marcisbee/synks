@@ -148,7 +148,7 @@ Ok, this is not that hard, but where's the catch? Do I need to do some extra stu
 
 ```jsx
 function *StateCounter() {
-  const [countContext] = yield CountContext;
+  const countContext = yield CountContext;
 
   while (true) {
     yield (
@@ -160,9 +160,7 @@ function *StateCounter() {
 }
 ```
 
-Ok so when you `yield` a context it automatically spits out corresponding context with it's update function: `[context, next]`.
-
-It works just like `useState` where `next({ count: 10 })` will update context state. And trigger update for all components using it.
+Ok so when you `yield` a context it automatically returns corresponding context.
 
 _NOTE_: Do not destruct `countContext` as it will be transformed to simple value and not be updatable.
 
@@ -245,7 +243,7 @@ Hooks can also use Context!
 
 ```jsx
 function* countHook() {
-  const [countContext] = yield CountContext;
+  const countContext = yield CountContext;
 
   const downHandler = ({ key }) => {
     if (key === 'ArrowUp') {

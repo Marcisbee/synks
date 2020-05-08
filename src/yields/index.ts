@@ -1,6 +1,6 @@
 import { ContextFunction, GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
 import { handleContext } from "./handle-context";
-import { handleHooks } from "./hook";
+import { handleHooks } from "./handle-hook";
 import { isContext } from "../utils/is-context";
 import { isHook } from "../utils/is-hook";
 

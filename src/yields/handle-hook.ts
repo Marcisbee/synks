@@ -1,8 +1,7 @@
 import { GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
 import { isContext } from "../utils/is-context";
 import { isHook } from "../utils/is-hook";
-
-export const SCOPE = Symbol("SCOPE");
+import { SCOPE } from "../symbols";
 
 export async function handleHooks(
   generator: GeneratorRenderer,

@@ -4,7 +4,7 @@ import { RouterContext } from '../app';
 let count = 0;
 
 export function* Hello({ what }) {
-  const [router] = yield RouterContext;
+  const router = yield RouterContext;
 
   while (true) {
     yield <h1 onclick={() => {

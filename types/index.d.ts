@@ -1,5 +1,7 @@
+import { UPDATE_CONTEXT } from "../src/symbols";
+
 export interface ContextInterface {
-  __update: () => void;
+  [UPDATE_CONTEXT]: () => void;
 }
 
 export type ContextFunction = new (...args: unknown[]) => ContextInterface;

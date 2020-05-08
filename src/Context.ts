@@ -1,4 +1,5 @@
 import { ContextInterface } from "../types/index.d";
+import { UPDATE_CONTEXT } from "./symbols";
 
 export class Context implements ContextInterface {
   constructor() {
@@ -7,15 +8,13 @@ export class Context implements ContextInterface {
     );
 
     keys.forEach((key) => {
-      if (key === '__update') return;
-
       const value = this[key];
 
       if (value instanceof Function) {
         this[key] = (...args: any[]): any => {
           const output = value.apply(this, args);
 
-          this.__update();
+          this[UPDATE_CONTEXT]();
 
           return output;
         };
@@ -23,6 +22,5 @@ export class Context implements ContextInterface {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  __update() { }
+  [UPDATE_CONTEXT](): void { }
 }
