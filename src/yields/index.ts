@@ -1,8 +1,8 @@
-import { VNode, Scope, NodeContext, GeneratorRenderer, ContextFunction } from "../../types";
-import { isHook } from "../utils/is-hook";
-import { isContext } from "../utils/is-context";
+import { ContextFunction, GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
+import { handleContext } from "./handle-context";
 import { handleHooks } from "./hook";
-import { handleContext } from "./context";
+import { isContext } from "../utils/is-context";
+import { isHook } from "../utils/is-hook";
 
 export async function handleCustomYields(
   generator: GeneratorRenderer,

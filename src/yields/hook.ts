@@ -1,6 +1,6 @@
-import { Scope, NodeContext, VNode, GeneratorRenderer } from "../../types";
-import { isHook } from "../utils/is-hook";
+import { GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
 import { isContext } from "../utils/is-context";
+import { isHook } from "../utils/is-hook";
 
 export const SCOPE = Symbol("SCOPE");
 

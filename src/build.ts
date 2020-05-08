@@ -1,4 +1,4 @@
-import { VNode, VNodeProps, TargetElement } from '../types';
+import { TargetElement, VNode, VNodeProps } from '../types';
 
 function getChildNodes(node: Node): ChildNode[] {
   return Array.prototype.slice.call(node.childNodes);

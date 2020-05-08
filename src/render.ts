@@ -1,16 +1,16 @@
-import { VNode, NodeContext, Scope, VNodeProps, GeneratorRenderer } from '../types';
+import { GeneratorRenderer, NodeContext, Scope, VNode, VNodeProps } from '../types';
 
-import { renderChildren } from './render-children';
-import { patchProps } from './patch-props';
-import { build } from './build';
-import { removeStranglers } from './remove-stranglers';
-import { removeNode } from './remove-node';
 import { arrayUnique } from './utils/array-unique';
+import { build } from './build';
+import { handleCustomYields } from './yields';
 import { isContext } from './utils/is-context';
 import { isGenerator } from './utils/is-generator';
+import { patchProps } from './patch-props';
 import { quickEqual } from './utils/quick-equal';
+import { removeNode } from './remove-node';
+import { removeStranglers } from './remove-stranglers';
+import { renderChildren } from './render-children';
 import { transformNode } from './transform-node';
-import { handleCustomYields } from './yields';
 
 let updateQueue = [];
 

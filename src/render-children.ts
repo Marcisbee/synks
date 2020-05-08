@@ -1,8 +1,8 @@
-import { VNode, NodeContext } from '../types';
+import { NodeContext, VNode } from '../types';
 
 import { asyncMap } from './utils/async-map';
-import { removeStranglers } from './remove-stranglers';
 import { patchProps } from './patch-props';
+import { removeStranglers } from './remove-stranglers';
 import { render } from './render';
 
 export async function renderChildren(

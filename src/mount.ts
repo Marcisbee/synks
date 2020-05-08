@@ -1,6 +1,5 @@
-import { VNode } from '../types';
-
 import { render } from './render';
+import { VNode } from '../types';
 
 export async function mount(
   node: VNode | VNode[],

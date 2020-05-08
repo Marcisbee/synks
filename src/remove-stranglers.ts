@@ -1,6 +1,5 @@
-import { VNode } from '../types';
-
 import { removeNode } from './remove-node';
+import { VNode } from '../types';
 
 export function removeStranglers(previous: VNode | VNode[]): void {
   if (previous instanceof Array) {

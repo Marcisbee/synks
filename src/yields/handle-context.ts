@@ -1,4 +1,4 @@
-import { Scope, NodeContext, VNode, GeneratorRenderer } from "../../types";
+import { GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
 import { isContext } from "../utils/is-context";
 
 export async function handleContext(

@@ -1,7 +1,6 @@
-
+import { Context } from './Context';
 import { h } from './h';
 import { mount } from './mount';
-import { Context } from './Context';
 import { SCOPE } from './yields/hook';
 
 export {
