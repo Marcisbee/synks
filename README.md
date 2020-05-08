@@ -69,7 +69,7 @@ function *Counter() {
 
 #### Data fetch example
 
-To handle async data fetching, we can use `async` functionaly component for this.
+To handle async data fetching, we can use `async` functional component for this.
 
 ```jsx
 async function Movies() {
@@ -89,7 +89,7 @@ _NOTE:_ This will halt all rendering of it's sibling components.
 
 #### Suspense example
 
-This will allow sibling components to render even when all of the childrens here are not yet ready.
+This will allow sibling components to render even when all of the children's here are not yet ready.
 
 ```jsx
 function Loading() {
@@ -164,7 +164,7 @@ Ok so when you `yield` a context it automatically spits out corresponding contex
 
 It works just like `useState` where `next({ count: 10 })` will update context state. And trigger update for all components using it.
 
-_NOTE_: Do not destruct `countContext` as it will be transformed to simple value and not be updateable.
+_NOTE_: Do not destruct `countContext` as it will be transformed to simple value and not be updatable.
 
 Here's a more in depth example of Contexts: [codesandbox.io/s/synks-30bze](https://codesandbox.io/s/synks-30bze?file=/src/index.tsx)
 
@@ -180,7 +180,7 @@ I currently call them hooks internally as they work more like hooks.
 
 It's just a generator function with ability to get parent components scope.
 
-Let's create our first hook, that will listen to keypressed events and increment value accordingly.
+Let's create our first hook, that will listen to `keypressed` events and increment value accordingly.
 
 ```jsx
 function* countHook() {
@@ -261,9 +261,9 @@ function* countHook() {
 
 ## Architecture
 
-Synks renders everything to DOM asyncronously. This means every exported method except `h` returns Promise. It waits for every component in it's child tree to be ready and only then it renders it.
+Synks renders everything to DOM asynchronously. This means every exported method except `h` returns Promise. It waits for every component in it's child tree to be ready and only then it renders it.
 
-This is poverful when using async data fetching and syncing all dom tree together.
+This is powerful when using async data fetching and syncing all dom tree together.
 
 It doesn't do incremental rendering, except when you specifically allow it with suspended async generators.
 
