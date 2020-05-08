@@ -1,5 +1,6 @@
 import { GeneratorRenderer, NodeContext, Scope, VNode, VNodeProps } from '../types';
 
+import { SCOPE_CHILDREN, UPDATE_CONTEXT } from './symbols';
 import { arrayUnique } from './utils/array-unique';
 import { build } from './build';
 import { handleCustomYields } from './yields';
@@ -11,7 +12,6 @@ import { removeNode } from './remove-node';
 import { removeStranglers } from './remove-stranglers';
 import { renderChildren } from './render-children';
 import { transformNode } from './transform-node';
-import { UPDATE_CONTEXT } from './symbols';
 
 let updateQueue = [];
 
@@ -57,26 +57,29 @@ export async function render(
 
       const nextFn = async (newContext: Record<string, any>): Promise<void> => {
         updateQueue = arrayUnique(events.concat(updateQueue));
+
+        // Update context state
         Object.assign(currentContext, newContext);
 
         const cache = updateQueue.slice().filter((d) => d.mounted && !d.rendering);
         updateQueue = [];
 
+        // Update subscribed components
         for (const event of cache) {
           if (event.mounted && !event.rendering) {
             await event.next();
           }
         }
       };
+
       currentContext[UPDATE_CONTEXT] = async (): Promise<any> => await nextFn.call(currentContext);
       context[name] = [currentContext, events];
 
       // Render children
-      const output = await render(currentNode.children, previousNode.children as any, container, childIndex, context);
-
-      return output;
+      return await render(currentNode.children, previousNode.children as any, container, childIndex, context);
     }
 
+    // Component update
     if (currentNode.type === previousNode.type && !!previousNode.instance) {
       const props = Object.assign({}, currentNode.props, {
         children: currentNode.children,
@@ -91,6 +94,7 @@ export async function render(
 
       const output = Object.assign(currentNode, previousNode);
 
+      // Don't update component as props are the same (in shallow level)
       if (quickEqual(props, props2) || (key1 !== null && key1 === key2)) {
         return output;
       }
@@ -111,7 +115,7 @@ export async function render(
     const scope: Scope = {
       mounted: true,
       rendering: false,
-      _c: [],
+      [SCOPE_CHILDREN]: [],
       async onMount() { },
       async onDestroy() { },
       async next() {
@@ -141,20 +145,20 @@ export async function render(
 
         await scope.onDestroy();
 
-        scope._c.forEach((s) => {
+        scope[SCOPE_CHILDREN].forEach((s) => {
           s.destroy();
         });
-        scope._c = [];
+        scope[SCOPE_CHILDREN] = [];
 
-        const parentScopes = context.scope && context.scope._c;
+        const parentScopes = context.scope && context.scope[SCOPE_CHILDREN];
         if (parentScopes) {
-          context.scope._c = parentScopes.filter((s) => s.mounted);
+          context.scope[SCOPE_CHILDREN] = parentScopes.filter((s) => s.mounted);
         }
       },
     };
 
     if (context.scope) {
-      context.scope._c.push(scope);
+      context.scope[SCOPE_CHILDREN].push(scope);
     }
 
     const newContext = Object.assign({}, context, {
@@ -164,10 +168,7 @@ export async function render(
     currentNode.scope = scope;
 
     let generator: GeneratorRenderer;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    // eslint-disable-next-line no-inner-declarations
-    async function renderSelf(previousTree: VNode | VNode[], props: VNodeProps = originalProps): Promise<VNode | VNode[]> {
+    const renderSelf = async (previousTree: VNode | VNode[], props: VNodeProps): Promise<VNode | VNode[]> => {
       Object.assign(originalProps, props);
 
       if (typeof fn === 'function') {
@@ -204,7 +205,7 @@ export async function render(
       return rendered;
     }
 
-    await renderSelf(previousNode);
+    await renderSelf(previousNode, originalProps);
 
     scope.onMount();
 

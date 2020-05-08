@@ -1,2 +1,3 @@
-export const SCOPE = Symbol("SCOPE");
-export const UPDATE_CONTEXT = Symbol("UPDATE_CONTEXT");
+export const SCOPE = Symbol();
+export const SCOPE_CHILDREN = Symbol();
+export const UPDATE_CONTEXT = Symbol();

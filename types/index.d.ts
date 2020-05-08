@@ -1,4 +1,4 @@
-import { UPDATE_CONTEXT } from "../src/symbols";
+import { SCOPE_CHILDREN, UPDATE_CONTEXT } from "../src/symbols";
 
 export interface ContextInterface {
   [UPDATE_CONTEXT]: () => void;
@@ -7,7 +7,7 @@ export interface ContextInterface {
 export type ContextFunction = new (...args: unknown[]) => ContextInterface;
 
 export interface Scope {
-  _c: Scope[];
+  [SCOPE_CHILDREN]: Scope[];
   mounted: boolean;
   next: () => Promise<void>;
   nextProps: (props: VNodeProps) => Promise<void>;
