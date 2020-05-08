@@ -81,7 +81,7 @@ export async function render(
 
     // Component update
     if (currentNode.type === previousNode.type && !!previousNode.instance) {
-      const props = Object.assign({}, currentNode.props, {
+      const props1 = Object.assign({}, currentNode.props, {
         children: currentNode.children,
       });
 
@@ -92,18 +92,10 @@ export async function render(
       const key1 = currentNode.key;
       const key2 = previousNode.key;
 
-      const output = Object.assign(currentNode, previousNode);
-
       // Don't update component as props are the same (in shallow level)
-      if (quickEqual(props, props2) || (key1 !== null && key1 === key2)) {
-        return output;
+      if (quickEqual(props1, props2) || (key1 !== null && key1 === key2)) {
+        return Object.assign(currentNode, previousNode);
       }
-
-      currentNode.props = props;
-
-      await output.scope.nextProps(props);
-
-      return output;
     }
 
     // Regular component
