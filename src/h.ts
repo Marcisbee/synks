@@ -1,6 +1,6 @@
-import { VNode, VNodeProps } from '../types';
+import { VNode, VNodeProps, VNodeType } from '../types';
 
-export function h(type: string | Function, props: VNodeProps, ...children: VNode[]): VNode {
+export function h(type: VNodeType, props: VNodeProps, ...children: VNode[]): VNode {
   const key = props && props.key
 
   return {

@@ -1,9 +1,5 @@
-import { Scope, NodeContext, VNode, GeneratorRenderer, ContextFunction } from "../../types";
-import { Context } from "../Context";
-
-export function isContext(value: any): value is ContextFunction {
-  return value && Object.getPrototypeOf(value) === Context;
-}
+import { Scope, NodeContext, VNode, GeneratorRenderer } from "../../types";
+import { isContext } from "../utils/is-context";
 
 export async function handleContext(
   generator: GeneratorRenderer,

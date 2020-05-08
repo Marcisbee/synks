@@ -31,8 +31,10 @@ export type VNodeProps = {
   [key: string]: unknown;
 } | null;
 
+export type VNodeType = string | ContextFunction | Function;
+
 export interface VNode extends VNodeHelpers {
-  type: string | ContextFunction | ((...args: unknown[]) => VNode | VNode[]);
+  type: VNodeType;
   props: VNodeProps;
   children: VNode[];
   key?: string;

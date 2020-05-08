@@ -5,17 +5,14 @@ import { patchProps } from './patch-props';
 import { build } from './build';
 import { removeStranglers } from './remove-stranglers';
 import { removeNode } from './remove-node';
-import { quickEqual } from './utils/quick-equal';
 import { arrayUnique } from './utils/array-unique';
+import { isContext } from './utils/is-context';
+import { isGenerator } from './utils/is-generator';
+import { quickEqual } from './utils/quick-equal';
 import { transformNode } from './transform-node';
 import { handleCustomYields } from './yields';
-import { isContext } from './yields/context';
 
 let updateQueue = [];
-
-export function isGenerator(value: any): value is GeneratorRenderer {
-  return value && typeof value.next === 'function' && typeof value.throw === 'function';
-}
 
 export async function render(
   currentNode: VNode | VNode[],
