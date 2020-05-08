@@ -23,7 +23,7 @@ export class RouterContext extends Synks.Context {
 }
 
 export function* Router(props: { routes: Record<string, any> }) {
-  const [router] = yield RouterContext;
+  const router = yield RouterContext;
 
   while (true) {
     const { routes } = props;
@@ -57,7 +57,7 @@ const routes = {
 };
 
 function* Header() {
-  const [router] = yield RouterContext;
+  const router = yield RouterContext;
 
   while (true) {
     yield (
