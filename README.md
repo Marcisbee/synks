@@ -12,8 +12,6 @@ Functions, promises and generators for component composition. And classes for co
 
 ## Installation
 
-> **NOTE:** This is proof of concept. Altho it's working as intended it might not be ready for production use!
-
 To install the stable version:
 
 ```
