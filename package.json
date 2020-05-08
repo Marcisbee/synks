@@ -1,6 +1,6 @@
 {
   "name": "synks",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Asynchronous view renderer",
   "main": "dist/synks.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,18 @@
     "type": "git",
     "url": "git+https://github.com/Marcisbee/synks.git"
   },
-  "keywords": [],
+  "keywords": [
+    "synks",
+    "components",
+    "generators",
+    "ui",
+    "user interface",
+    "dom",
+    "vdom",
+    "virtual dom",
+    "framework",
+    "view"
+  ],
   "author": "Marcis Bergmanis <marcisbergmanis@gmail.com>",
   "license": "MIT",
   "bugs": {
