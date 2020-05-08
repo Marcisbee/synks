@@ -174,7 +174,7 @@ export async function render(
         output = await fn.call(scope, props);
 
         // Generator component
-        if (isGenerator(output)) {
+        if (isGenerator<GeneratorRenderer>(output)) {
           if (!generator) {
             generator = output;
           }

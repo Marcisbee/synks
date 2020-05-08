@@ -1,6 +1,6 @@
-import { GeneratorRenderer, NodeContext, Scope, VNode } from "../../types";
+import { GeneratorRenderer, Hook, NodeContext, Scope, VNode } from "../../types";
 import { isContext } from "../utils/is-context";
-import { isHook } from "../utils/is-hook";
+import { isGenerator } from "../utils/is-generator";
 import { SCOPE } from "../symbols";
 
 export async function handleHooks(
@@ -10,7 +10,7 @@ export async function handleHooks(
   node: VNode | VNode[],
   hook: any
 ): Promise<any> {
-  if (!isHook(hook)) return hook;
+  if (!isGenerator<Hook>(hook)) return hook;
 
   let value = await hook.next();
 
