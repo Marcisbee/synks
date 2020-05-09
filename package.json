@@ -1,6 +1,6 @@
 {
   "name": "synks",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Asynchronous view renderer",
   "main": "dist/synks.js",
   "types": "dist/index.d.ts",

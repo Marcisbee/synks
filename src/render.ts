@@ -31,7 +31,7 @@ export async function render(
     return await renderChildren(currentNode.map(transformNode), prevNodes, container, childIndex, context);
   }
 
-  currentNode = transformNode(currentNode);
+  currentNode = transformNode<VNode>(currentNode);
 
   if (previousNode && previousNode.type instanceof Function && currentNode && currentNode.type !== previousNode.type) {
     const cachedTarget = previousNode && Object.assign({}, previousNode.instance);
