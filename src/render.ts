@@ -14,6 +14,13 @@ import { renderChildren } from './render-children';
 import { transformNode } from './transform-node';
 
 let updateQueue = [];
+let cleanupQueue = [];
+
+function startCleanup() {
+  const cleanup = cleanupQueue.slice();
+  cleanupQueue = [];
+  cleanup.forEach((d) => d());
+}
 
 export async function render(
   currentNode: VNode | VNode[],
@@ -41,7 +48,9 @@ export async function render(
     }
 
     if (cachedTarget) {
-      removeNode(cachedTarget);
+      cleanupQueue.push(() => {
+        removeNode(cachedTarget);
+      });
     }
   }
 
@@ -183,6 +192,9 @@ export async function render(
       }
 
       const rendered = await render(output, previousTree as VNode, container, childIndex, newContext);
+
+      startCleanup();
+
       if (!(currentNode instanceof Array)) {
         currentNode.instance = output;
       }
