@@ -162,7 +162,7 @@ Ok so when you `yield` a context it automatically returns corresponding context.
 
 _NOTE_: Do not destruct `countContext` as it will be transformed to simple value and not be updatable.
 
-Here's a more in depth example of Contexts: [codesandbox.io/s/synks-30bze](https://codesandbox.io/s/synks-30bze?file=/src/index.tsx)
+Here's a more in depth example of Contexts: [stackblitz.com/edit/vite-6agmqe](https://stackblitz.com/edit/vite-6agmqe?file=src/main.tsx)
 
 #### Code reuse (mixins vs hooks story)
 
@@ -229,7 +229,7 @@ function* Counter() {
 }
 ```
 
-This example available in [https://codesandbox.io/s/synks-hooks-9fehi](https://codesandbox.io/s/synks-hooks-9fehi?file=/src/app/app.tsx)
+This example available in [stackblitz.com/edit/vite-cdemev](https://stackblitz.com/edit/vite-cdemev?file=src/main.tsx)
 
 This is it, now it's fully functional - locally scoped hook used in Counter component.
 
