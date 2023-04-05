@@ -8,7 +8,7 @@ Functions, promises and generators for component composition. And classes for co
 [![npm version](https://img.shields.io/npm/v/synks.svg?style=flat-square)](https://www.npmjs.com/package/synks)
 [![npm downloads](https://img.shields.io/npm/dm/synks.svg?style=flat-square)](https://www.npmjs.com/package/synks)
 [![npm bundle size (version)](https://img.shields.io/bundlephobia/minzip/synks/latest?style=flat-square)](https://bundlephobia.com/result?p=synks)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Marcisbee/synks/Tests?style=flat-square)](https://github.com/Marcisbee/synks/actions?query=workflow%3ATests)
+[![discord](https://dcbadge.vercel.app/api/server/a62gfaDW2e?style=flat-square)](https://discord.gg/a62gfaDW2e)
 
 ## Installation
 
